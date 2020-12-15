@@ -15,6 +15,25 @@ def answer1(input, preamble):
     if not success: return lines[i]
 
 
+def getRange(lines, number):
+  for i in range(len(lines)):
+    sum = 0
+    index = i
+    while sum < number:
+      sum += lines[index]
+      index += 1
+    if sum == number: return lines[i:index]
+
+
+def answer2(input, number):
+  lines = list(map(int, input.split('\n')))
+  range = getRange(lines, number)
+  smol = min(range)
+  yuge = max(range)
+  return smol + yuge  
+
+
 f = open('input.txt', 'r')
-print(answer1(f.read(), 25))
+# print(answer1(f.read(), 25))
+print(answer2(f.read(), 22406676))
  
