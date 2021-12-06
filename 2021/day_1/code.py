@@ -1,7 +1,13 @@
-def answer1(input):
-  lines = input.split('\n')
-  zipped = zip(lines, lines[1:])
-  return len([x for x in zipped[:-1] if int(x[1]) > int(x[0])])
+def answer2(lines):
+  zipped = zip(lines, lines[1:], lines[2:])
+  return answer1([int(x[0])+int(x[1])+int(x[2]) for x in zipped])
 
-f = open('input.txt', 'r')
-print(answer1(f.read()))
+def answer1(lines):
+  zipped = zip(lines, lines[1:])
+  return len([x for x in zipped if int(x[1]) > int(x[0])])
+
+FILENAME = 'input.txt'
+
+f = open(FILENAME, 'r')
+input = f.read().split('\n')
+print(answer2(input))
