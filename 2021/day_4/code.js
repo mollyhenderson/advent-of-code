@@ -71,9 +71,18 @@ const setup = (input) => {
 }
 
 const answer2 = (input) => {
-  const { boards, numsCalled } = setup(input);
+  let { boards, numsCalled } = setup(input);
 
-  
+  for (let i = 0; i < numsCalled.length; i++) {
+    const num = numsCalled[i];
+    boards.forEach(board => board.markValue(num));
+    const winner = boards.find(board => board.isBingo());
+    boards = boards.filter(board => !board.isBingo());
+
+    if (boards.length === 0) {
+      return winner.score(num);
+    }
+  }
 }
 
 const answer1 = (input) => {
@@ -85,7 +94,7 @@ const answer1 = (input) => {
     // console.log(`-${num}-`)
     // console.log(boards.join('\n\n'))
     // console.log('\n\n---\n\n')
-    const bingoBoard = boards.find(b => b.isBingo(num));
+    const bingoBoard = boards.find(b => b.isBingo());
     if (bingoBoard) {
       return bingoBoard.score(num);
     }
@@ -96,4 +105,4 @@ const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
-console.log(answer1(input));
+console.log(answer2(input));
