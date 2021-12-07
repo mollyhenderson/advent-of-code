@@ -53,6 +53,26 @@ class Map {
       }
       this.map[y] = arr;
     }
+    else {
+      // diagonal
+      if (y1 > y2) {
+        // can't use orderVals bc I need the points to stay together
+        [y1, y2] = [y2, y1];
+        [x1, x2] = [x2, x1];
+      }
+      let x = x1;
+      for (let i = y1; i <= y2; i++) {
+         const arr = this.map[i] ?? [];
+         if (!arr[x]) {
+          arr[x] = new Point(x, i);
+        }
+        arr[x].addCoverage();
+        this.map[i] = arr;
+
+        if (x > x2) x--;
+        else x++;
+      }
+    }
   }
 
   getOverlaps() {
