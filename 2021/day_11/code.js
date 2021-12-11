@@ -57,6 +57,19 @@ const printGrid = (grid) => {
   console.log();
 }
 
+const answer2 = (input) => {
+  const grid = fillGrid(input).flat()
+  let i = 1;
+  while(true) {
+    flashes = 0;
+    grid.forEach(o => o.step());
+    grid.forEach(o => o.endStep());
+
+    if (flashes === 100) return i;
+    i++;
+  }
+}
+
 const answer1 = (input) => {
   const STEP_COUNT = 100;
   const grid = fillGrid(input).flat()
@@ -73,4 +86,4 @@ const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
-console.log(answer1(input));
+console.log(answer2(input));
