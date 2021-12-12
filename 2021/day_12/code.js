@@ -27,6 +27,40 @@ class Path {
   }
 }
 
+class Path2 {
+  constructor(canVisitTwice, ...path) {
+    this.path = path;
+    this.canVisitTwice = canVisitTwice;
+  }
+
+  get(cave) {
+    return this.path.find(c => c.equals(cave));
+  }
+
+  at(index) {
+    return index > 0 ? this.path[index] : this.path[this.path.length + index];
+  }
+
+  add(caveToAdd) {
+    const existingCave = this.get(caveToAdd);
+    if (existingCave) {
+      if (existingCave.small && this.canVisitTwice !== existingCave.name) return false;
+      if (this.canVisitTwice === existingCave.name && (this.path.filter(c => c.equals(existingCave)).length > 1)) return false;
+    }
+    this.path.push(existingCave ?? caveToAdd);
+    return this;
+  }
+
+  newPathWith(cave) {
+    const clone = new Path2(this.canVisitTwice, ...this.path);
+    return clone.add(cave);
+  }
+
+  toString() {
+    return this.path.map(c => c.name).join(',');
+  }
+}
+
 class Cave {
   constructor(name) {
     this.name = name;
@@ -56,6 +90,10 @@ class CaveList {
     }
     return cave;
   }
+
+  smallCaves() {
+    return this.caves.filter(c => c.small && c.name !== 'start' && c.name !== 'end');
+  }
 }
 
 const fillCaves = (input) => {
@@ -70,18 +108,12 @@ const fillCaves = (input) => {
   return caves;
 }
 
-const answer1 = (input) => {
-  const caves = fillCaves(input);
-
-  const start = caves.getOrAdd('start');
-  const end = caves.getOrAdd('end');
-
+const traverse = (partialPaths) => {
   const paths = [];
-  let partialPaths = start.connections.map(c => new Path(start, c));
   while(partialPaths.length > 0) {
     const path = partialPaths.pop();
     const next = path.at(-1);
-    if (next.equals(end)) {
+    if (next.name === 'end') {
       paths.push(path);
     } 
     else {
@@ -90,6 +122,30 @@ const answer1 = (input) => {
         .filter(x => x));
     }
   }
+  return paths;
+}
+
+const answer2 = (input) => {
+  const caves = fillCaves(input);
+
+  const start = caves.getOrAdd('start');
+  const smallCaves = caves.smallCaves();
+  let partialPaths = start.connections.map(c => {
+    return smallCaves.map(canVisitTwice => 
+      new Path2(canVisitTwice.name, start, c));
+  }).flat();
+
+  const paths = traverse(partialPaths);
+  const pathStrings = paths.map(p => p.toString());
+  return (new Set(pathStrings)).size;
+}
+
+const answer1 = (input) => {
+  const caves = fillCaves(input);
+
+  const start = caves.getOrAdd('start');
+  let partialPaths = start.connections.map(c => new Path(start, c));
+  const paths = traverse(partialPaths);
   return paths.length;
 }
 
