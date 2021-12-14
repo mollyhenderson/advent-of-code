@@ -23,6 +23,60 @@ const parseInput = (input) => {
   }
 }
 
+const makeMatrix = (size) => {
+  const matrix = [];
+  for (let i = 0; i < size; i++) {
+    matrix.push(new Array(size).fill(0));
+  }
+  return matrix;
+}
+
+const sum = (arr) => arr.reduce((sum, val) => sum + val, 0);
+
+const answer2 = (input) => {
+  const STEPS = 40;
+
+  const template = input[0];
+  const rules = input.slice(2);
+
+  const chars = Array.from(
+    new Set(rules.join('')
+      .split('')
+      .filter(c => ![' ', '-', '>'].includes(c))));
+
+  const ruleMatrix = makeMatrix(chars.length);
+  rules.forEach(r => {
+    const [, one, two, three] = r.match(/(.)(.) -> (.)/);
+    ruleMatrix[chars.indexOf(one)][chars.indexOf(two)] = chars.indexOf(three);
+  });
+
+  let countMatrix = makeMatrix(chars.length);
+  for (let i = 0; i < template.length-1; i++) {
+    countMatrix[chars.indexOf(template[i])][chars.indexOf(template[i+1])] += 1;
+  }
+
+  for (let i = 0; i < STEPS; i++) {
+    const newCountMatrix = makeMatrix(chars.length);
+    countMatrix.forEach((row, i) => {
+      row.forEach((entry, j) => {
+        const mid = ruleMatrix[i][j];
+
+        newCountMatrix[i][mid] += entry;
+        newCountMatrix[mid][j] += entry;
+      });
+    });
+    countMatrix = newCountMatrix;
+  }
+  // sum all pairs that start with a given char
+  const finalCounts = countMatrix.map(row => sum(row));
+  // and account for the final char
+  finalCounts[chars.indexOf(template[template.length-1])]++;
+
+  const max = Math.max(...finalCounts);
+  const min = Math.min(...finalCounts);
+  return max - min;
+}
+
 const answer1 = (input) => {
   const STEPS = 10;
 
@@ -45,8 +99,9 @@ const answer1 = (input) => {
     acc[val]++;
     return acc;
   }, {});
-  const max = Math.max(...Object.values(countMap));
-  const min = Math.min(...Object.values(countMap));
+  const counts = Object.values(countMap);
+  const max = Math.max(...counts);
+  const min = Math.min(...counts);
   return max - min;
 }
 
@@ -54,4 +109,4 @@ const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
-console.log(answer1(input));
+console.log(answer2(input));
