@@ -8,56 +8,18 @@ class Location {
     this.risk = parseInt(risk, 10);
     this.adjacents = [];
     this.id = id++;
+
+    this.visited = false;
+    this.prev = null;
+    this.dist = Infinity;
   }
 
   addAdjacent(location) {
     this.adjacents.push(location);
   }
 
-  getMinAdjacent() {
-    let min = Infinity;
-    let index = -1;
-    this.adjacents.forEach((a, i) => {
-      if (a.risk < min) {
-        min = a.risk;
-        index = i;
-      }
-    });
-    return this.adjacents[index];
-  }
-
   equals(other) {
     return other.id === this.id;
-  }
-}
-
-class Path {
-  constructor(risk, ...path) {
-    this.path = path;
-    this._risk = risk;
-  }
-
-  last() {
-    return this.path[this.path.length-1];
-  }
-
-  add(nextLocation) {
-    this.path.push(nextLocation);
-    this._risk += nextLocation.risk;
-    return this;
-  }
-
-  contains(location) {
-    return this.path.some(l => l.id === location.id);
-  }
-
-  newPathWith(location) {
-    const clone = new Path(this._risk, ...this.path);
-    return clone.add(location);
-  }
-
-  risk() {
-    return this._risk;
   }
 }
 
@@ -68,27 +30,33 @@ const fillGraph = (input) => {
     const line = graph[i];
     for (let j = 0; j < line.length; j++) {
       const location = line[j];
-      // if (j > 0) location.addAdjacent(line[j-1]);
+      if (j > 0) location.addAdjacent(line[j-1]);
       if (j < line.length-1) location.addAdjacent(line[j+1]);
-      // if (i > 0) location.addAdjacent(graph[i-1][j]);
+      if (i > 0) location.addAdjacent(graph[i-1][j]);
       if (i < graph.length-1) location.addAdjacent(graph[i+1][j]);
     }
   }
   return graph;
 }
 
-const traverse = (partialPaths, end) => {
-  while(!partialPaths.isEmpty()) {
-    const path = partialPaths.pop();
-    const next = path.last();
-    if (next.equals(end)) {
+const traverse = (locations, end) => {
+  while(locations.length) {
+    const location = locations.sort((a, b) => a.dist - b.dist).shift();
+    // console.log(locations.map(l => l.dist).join(','));
+    location.visited = true;
+    if (location.equals(end)) {
       // success!
-      return path;
-    } 
+      return location;
+    }
     else {
-      const nextLocations = next.adjacents.filter(a => !path.contains(a));
-      if (nextLocations.includes(end)) return path.add(end);
-      partialPaths.push(...nextLocations.map(a => path.newPathWith(a)));
+      const nextLocations = location.adjacents.filter(a => !a.visited);
+      nextLocations.forEach(l => {
+        const alt = location.dist + l.risk;
+        if (alt < l.dist) {
+          l.dist = alt;
+          l.prev = location;
+        }
+      });
     }
   }
   return 'ohno';
@@ -100,12 +68,11 @@ const answer1 = (input) => {
   const start = graph[0];
   const end = graph[graph.length-1];
 
-  const pq = new PriorityQueue((a, b) => a.risk() < b.risk());
-  pq.push(...start.adjacents.map(c => new Path(c.risk, start, c)));
+  start.dist = 0;
 
-  const path = traverse(pq, end);
+  const lastInPath = traverse(graph, end);
 
-  return path.risk();
+  return lastInPath.dist;
 
 }
 
