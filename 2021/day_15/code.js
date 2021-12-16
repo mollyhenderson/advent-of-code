@@ -9,6 +9,8 @@ class Location {
     this.adjacents = [];
     this.id = id++;
 
+    this.isEnd = false;
+
     this.visited = false;
     this.prev = null;
     this.dist = Infinity;
@@ -34,17 +36,47 @@ const fillGraph = (input) => {
       if (j < line.length-1) location.addAdjacent(line[j+1]);
       if (i > 0) location.addAdjacent(graph[i-1][j]);
       if (i < graph.length-1) location.addAdjacent(graph[i+1][j]);
+
+      if (i === graph.length-1 || j === line.length-1) location.isEnd = true;
     }
   }
   return graph;
 }
 
+const buildNewInput = (input) => {
+  const newInput = [];
+
+  for (let i = 0; i < 5; i++) {
+    input.forEach((line) => {
+      let newLine = '';
+      for (let j = 0; j < 5; j++) {
+        const incremented = line.split('').map(c => {
+          const num = parseInt(c, 10);
+          let newNum = num + i + j;
+          if (newNum > 9) newNum = newNum - 9;
+          newLine += newNum;
+        });
+      }
+      newInput.push(newLine);
+    });
+  }
+
+  return newInput;
+}
+
 const traverse = (locations, end) => {
   while(locations.length) {
-    const location = locations.sort((a, b) => a.dist - b.dist).shift();
-    // console.log(locations.map(l => l.dist).join(','));
+    let index = -1;
+    let minDist = Infinity;
+    for (let i = 0; i < locations.length; i++) {
+      if (locations[i].dist < minDist) {
+        index = i;
+        minDist = locations[i].dist;
+      }
+    }
+    const [location] = locations.splice(index, 1);
     location.visited = true;
-    if (location.equals(end)) {
+    if (location.isEnd) {
       // success!
       return location;
     }
@@ -62,6 +94,12 @@ const traverse = (locations, end) => {
   return 'ohno';
 }
 
+const answer2 = (input) => {
+  // maybe do this until we reach the end?
+  return answer1(input);
+  // return answer1(buildNewInput(input));
+}
+
 const answer1 = (input) => {
   const graph = fillGraph(input).flat();
 
@@ -71,13 +109,12 @@ const answer1 = (input) => {
   start.dist = 0;
 
   const lastInPath = traverse(graph, end);
-
+  console.log(lastInPath);
   return lastInPath.dist;
-
 }
 
-const FILENAME = 'input.txt';
+const FILENAME = 'test_input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
-console.log(answer1(input));
+console.log(answer2(input));
