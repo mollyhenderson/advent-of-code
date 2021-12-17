@@ -33,7 +33,6 @@ const launch = (xVelocity, yVelocity, target) => {
     render(steps, target);
     return Math.max(...steps.map(s => s.y));
   }
-  render(steps, target);
   return false;
 }
 
@@ -46,14 +45,24 @@ const answer1 = (input) => {
   const target = parseInput(input);
   // TODO: find x,y such that maxY is maximized
   // binary search that mofo?
-  let x = 7;
-  let y = 2;
-  const maxY = launch(x, y, target);
+
+  // For test input, these situations all work:
+  // 6,1 - 6,9
+  // 7,0 - 7,9
+  // 8,0 - 8,1
+  // 9,0
+
+  let maxY = 0;
+  for (let i = 6; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
+      console.log({x: i, y: j});
+      maxY = Math.max(maxY, launch(i, j, target));
+    }
+  }
   return maxY;
 }
 
 const FILENAME = 'test_input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
-// const input = f.split('\n');
 console.log(answer1(f));
