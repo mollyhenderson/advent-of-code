@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 function calcFuel(n) {
-  return Math.max(0, Math.floor(parseInt(n) / 3) - 2);
+  return Math.max(0, Math.floor(parseInt(n, 10) / 3) - 2);
 }
 
 function calcFuelRecursive(n) {
@@ -25,11 +25,8 @@ function answer2(input) {
   }, 0);
 }
 
-function readInput(filename) {
-  const input = fs.readFileSync(filename, { encoding: 'utf8' });
-  return input.split('\r\n');
-}
+const FILENAME = 'input.txt';
 
-const input = readInput('input.txt');
-
+const f = fs.readFileSync(FILENAME, 'utf-8');
+const input = f.split('\n');
 console.log(answer2(input));
