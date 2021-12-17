@@ -28,8 +28,12 @@ const launch = (xVelocity, yVelocity, target) => {
     else if (xVelocity < 0) xVelocity += 1;
     yVelocity -= 1;
   }
+  if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+    steps.push({x,y});
+    render(steps, target);
+    return Math.max(...steps.map(s => s.y));
+  }
   render(steps, target);
-  if (x >= minX && x <= maxX && y >= minY && y <= maxY) return Math.max(...steps.map(s => s.y));
   return false;
 }
 
