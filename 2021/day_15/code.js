@@ -9,8 +9,7 @@ class Location {
     this.adjacents = [];
     this.id = id++;
 
-    this.isEnd = false;
-
+    this.opened = false;
     this.visited = false;
     this.prev = null;
     this.dist = Infinity;
@@ -36,8 +35,6 @@ const fillGraph = (input) => {
       if (j < line.length-1) location.addAdjacent(line[j+1]);
       if (i > 0) location.addAdjacent(graph[i-1][j]);
       if (i < graph.length-1) location.addAdjacent(graph[i+1][j]);
-
-      if (i === graph.length-1 || j === line.length-1) location.isEnd = true;
     }
   }
   return graph;
@@ -76,13 +73,17 @@ const traverse = (locations, end) => {
     }
     const [location] = locations.splice(index, 1);
     location.visited = true;
-    if (location.isEnd) {
+    if (location.equals(end)) {
       // success!
       return location;
     }
     else {
       const nextLocations = location.adjacents.filter(a => !a.visited);
       nextLocations.forEach(l => {
+        if (!l.opened) {
+          l.opened = true;
+          locations.push(l);
+        }
         const alt = location.dist + l.risk;
         if (alt < l.dist) {
           l.dist = alt;
@@ -95,9 +96,7 @@ const traverse = (locations, end) => {
 }
 
 const answer2 = (input) => {
-  // maybe do this until we reach the end?
-  return answer1(input);
-  // return answer1(buildNewInput(input));
+  return answer1(buildNewInput(input));
 }
 
 const answer1 = (input) => {
@@ -108,12 +107,11 @@ const answer1 = (input) => {
 
   start.dist = 0;
 
-  const lastInPath = traverse(graph, end);
-  console.log(lastInPath);
+  const lastInPath = traverse([start], end);
   return lastInPath.dist;
 }
 
-const FILENAME = 'test_input.txt';
+const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
