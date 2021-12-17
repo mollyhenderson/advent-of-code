@@ -1,9 +1,11 @@
 const fs = require('fs');
 
+const getMaxY = (steps) => Math.max(...steps.map(s => s.y));
+
 const render = (steps, target) => {
   const { minX, maxX, minY, maxY } = target;
 
-  const overallMaxY = Math.max(...steps.map(s => s.y));
+  const overallMaxY = getMaxY(steps);
   for (let i = overallMaxY; i >= minY; i--) {
     let line = '';
     for (let j = 0; j <= maxX; j++) {
@@ -30,9 +32,11 @@ const launch = (xVelocity, yVelocity, target) => {
   }
   if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
     steps.push({x,y});
-    render(steps, target);
-    return Math.max(...steps.map(s => s.y));
+    // render(steps, target);
+    console.log('✓');
+    return getMaxY(steps);
   }
+  // render(steps, target);
   return false;
 }
 
@@ -43,8 +47,6 @@ const parseInput = (input) => {
 
 const answer1 = (input) => {
   const target = parseInput(input);
-  // TODO: find x,y such that maxY is maximized
-  // binary search that mofo?
 
   // For test input, these situations all work:
   // 6,1 - 6,9
@@ -52,17 +54,37 @@ const answer1 = (input) => {
   // 8,0 - 8,1
   // 9,0
 
+  // For real input:
+  // 19,3 - 19,53 && 19,62 - 19,108
+  // 20,1 - 20,3
+  // 21,0 - 21,1
+  // 22,0
+
   let maxY = 0;
-  for (let i = 6; i < 10; i++) {
-    for (let j = 0; j < 10; j++) {
-      console.log({x: i, y: j});
-      maxY = Math.max(maxY, launch(i, j, target));
+  for (let x = 19; x < 20; x++) {
+    for (let y = 0; y < 10000; y++) {
+      const thisMaxY = launch(x, y, target);
+      if (thisMaxY > maxY) {
+        maxY = thisMaxY;
+        console.log({x, y, maxY})
+      }
     }
   }
   return maxY;
+
+  // // TEST
+  // let maxY = 0;
+  // for (let x = 6; x < 10; x++) {
+  //   for (let y = 0; y < 10; y++) {
+  //     console.log({x, y});
+  //     maxY = Math.max(maxY, launch(x, y, target));
+  //     console.log(maxY);
+  //   }
+  // }
+  // return maxY;
 }
 
-const FILENAME = 'test_input.txt';
+const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 console.log(answer1(f));
