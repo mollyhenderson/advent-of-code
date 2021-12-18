@@ -1,78 +1,131 @@
 const fs = require('fs');
 
-const add = (a, b) => {
-  const r = `[${a},${b}]`;
-  console.log({sum: r})
-  return r;
-}
+const isNumber = (n) => Number.isInteger(n);
 
-const reverse = (str) => {
-  return str.split('').reverse().join('');
-}
+class SnailfishNumber {
+  constructor({ left, right, value } = { left: null, right: null, value: null }) {
+    this.value = value;
+    this.left = left;
+    this.right = right;
+    this.parent = null;
 
-const replaceAt = (str, index, char) => {
-  return str.substring(0, index) + char + str.substring(index+1);
-}
-
-const explode = (n, i) => {
-  console.log('explode time');
-  console.log(n.substring(i, i+5));
-  const leftNum = parseInt(n[i+1], 10);
-  const rightNum = parseInt(n[i+3], 10);
-
-  let leftBit = n.substring(0, i);
-  let rightBit = n.substring(i+5);
-
-  const numToLeftIndex = leftBit.length-1 - reverse(leftBit).search(/\d/);
-  console.log({numToLeftIndex, i})
-  if (numToLeftIndex > -1 && numToLeftIndex < i) {
-    const numToLeft = parseInt(n[numToLeftIndex], 10);
-    leftBit = replaceAt(leftBit, numToLeftIndex, numToLeft + leftNum);
+    if (this.left) this.left.parent = this;
+    if (this.right) this.right.parent = this;
   }
 
-  const numToRightIndex = rightBit.search(/\d/);
-  if (numToRightIndex > -1) {
-    const numToRight = parseInt(rightBit[numToRightIndex], 10);
-    rightBit = replaceAt(rightBit, numToRightIndex, numToRight + rightNum);
+  isLeaf() {
+    return isNumber(this.value);
   }
 
-  return leftBit + '0' + rightBit;
-}
+  isLeftChild() {
+    return this.parent?.left === this;
+  }
 
-const condition1 = (n) => {
-  console.log('condition 1');
-  const q = [];
-  let numToLeftIndex = -1;
-  for (const [i, c] of n.split('').entries()) {
-    if (c === '[') {
-      if (q.length === 4) {
-        // hit our condition
-        const exploded = explode(n, i);
-        console.log({exploded})
-        return [true, exploded];
-      }
-      else {
-        q.push(c);
-      }
+  isRightChild() {
+    return this.parent?.right === this;
+  }
+
+  addToLeftmost(toAdd) {
+    let node = this;
+    while (!node.isLeaf()) {
+      node = node.left;
     }
-    else if (c === ']') {
-      q.pop();
-    }
+    node.value += toAdd;
   }
-  return [false, n];
+
+  addToRightmost(toAdd) {
+    let node = this;
+    while (!node.isLeaf()) {
+      node = node.right;
+    }
+    node.value += toAdd;
+  }
+
+  updateNextLeft(toAdd) {
+    let node = this;
+    while(node && node.isLeftChild()) {
+      node = node.parent;
+    }
+    node = node.parent;
+    if (node) node.left.addToRightmost(toAdd);
+  }
+
+  updateNextRight(toAdd) {
+    let node = this;
+    while (node.parent && node.isRightChild()) {
+      node = node.parent;
+    }
+    node = node.parent;
+    if (node) node.right.addToLeftmost(toAdd);
+  }
+
+  explode() {
+    // console.log('exploding', this.toString());
+    this.updateNextLeft(this.left);
+    this.updateNextRight(this.right);
+
+    this.left = undefined;
+    this.right = undefined;
+    this.value = 0;
+  }
+
+  split() {
+    const newLeft = new SnailfishNumber({ value: Math.floor(this.value / 2) });
+    const newRight = new SnailfishNumber({ value: Math.ceil(this.value / 2) });
+    this.value = undefined;
+
+    newLeft.parent = this;
+    newRight.parent = this;
+
+    this.left = newLeft;
+    this.right = newRight;
+  }
+
+  toString() {
+    if (this.isLeaf()) return this.value;
+    return `[${this.left.toString()},${this.right.toString()}]`;
+  }
 }
 
-const condition2 = (n) => {
-  console.log('condition 2');
-  const i = n.search(/\d\d/);
-  console.log({i});
-  if (i > -1) {
-    const num = parseInt(n.substring(i, i+2), 10);
-    const split = n.substring(0, i) + add(Math.floor(num/2), Math.ceil(num/2)) + n.substring(i+2);
-    console.log({split});
-    return [true, split];
+const getFirstDeepest = (root, depth=0) => {
+  if (depth >= 4 && !root.isLeaf()) return root;
+
+  if (!root.isLeaf()) {
+    const node = getFirstDeepest(root.left, depth+1);
+    if (node) return node;
   }
-  return [false, n];
+  if (!root.isLeaf()) {
+    return getFirstDeepest(root.right, depth+1);
+  }
+  return false;
+}
+
+const condition1 = (root) => {
+  // console.log('checking condition 1', root.toString());
+  const node = getFirstDeepest(root);
+  if (node) {
+    node.explode();
+    return true;
+  }
+  return false;
+}
+
+const condition2 = (root) => {
+  // console.log('checking condition 2', root.toString());
+  if (root.value > 9) {
+    // console.log('split', root.toString());
+    root.split();
+    return true;
+  }
+
+  if (root.left) {
+    const done = condition2(root.left);
+    if (done) return done;
+  }
+  if (root.right) {
+    return condition2(root.right);
+  }
+  return false;
 }
 
 const reduce = (n) => {
@@ -80,17 +133,49 @@ const reduce = (n) => {
   let split = false;
   let i = 0;
   while(exploded || split) {
-    ([exploded, n] = condition1(n));
+    // console.log(n.toString());
+    exploded = condition1(n);
     if (!exploded) {
-      ([split, n] = condition2(n));
+      split = condition2(n);
     }
     i++;
   }
+  // console.log('REDUCED NUMBER:')
+  // console.log(n.toString());
   return n;
 }
 
+const add = (a, b) => new SnailfishNumber({ left: a, right: b });
+
+const parseInput = (input) => {
+  if (input.match(/^\d+$/)) {
+    return new SnailfishNumber({ value: parseInt(input, 10) });
+  }
+
+  const q = [];
+  for (const [i, c] of input.split('').entries()) {
+    if (c === '[') {
+      q.push(c);
+    }
+    else if (c === ']') {
+      q.pop();
+    }
+    else if (c === ',') {
+      if (q.length === 1) {
+        // found our split point
+        const first = input.substring(1, i);
+        const second = input.substring(i+1, input.length-1);
+        return new SnailfishNumber({ left: parseInput(first), right: parseInput(second) });
+      }
+    }
+  }
+  return parseInput(input.substring(firstIndex+1, lastIndex));
+}
+
 const answer1 = (input) => {
-  return input.slice(1).reduce((sum, n) => reduce(add(sum, n)), input[0]);
+  const sum = input.slice(1).reduce((sum, n) => reduce(add(sum, parseInput(n))), parseInput(input[0]));
+  // TODO: get magnitude
+  console.log(sum.toString());
 }
 
 const FILENAME = 'test_input.txt';
