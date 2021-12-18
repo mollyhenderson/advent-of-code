@@ -22,27 +22,50 @@ const launch = (xVelocity, yVelocity, target) => {
   let x = y = 0;
   const { minX, maxX, minY, maxY } = target;
   const steps = [];
-  while (x < maxX && y > maxY) {
+  while (x < maxX && y > minY) {
     steps.push({x, y});
     x += xVelocity;
     y += yVelocity;
     if (xVelocity > 0) xVelocity -= 1;
     else if (xVelocity < 0) xVelocity += 1;
     yVelocity -= 1;
+
+    if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+      steps.push({x,y});
+      return getMaxY(steps);
+    }
   }
-  if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
-    steps.push({x,y});
-    // render(steps, target);
-    console.log('✓');
-    return getMaxY(steps);
-  }
-  // render(steps, target);
   return false;
 }
 
 const parseInput = (input) => {
   [, minX, maxX, minY, maxY] = input.match(/target area: x=([\d-]+)\.\.([\d-]+), y=([\d-]+)\.\.([\d-]+)/);
   return { minX, maxX, minY, maxY };
+}
+
+const answer2 = (input) => {
+  const target = parseInput(input);
+
+  let count = 0;
+  // These variables are for debugging purposes
+  let maxY = 0;
+  let minY = Infinity;
+  let maxX = 0;
+  let minX = Infinity;
+  for (let x = 0; x < 202; x++) {
+    for (let y = -109; y < 200; y++) {
+      const success = launch(x, y, target);
+      if (success !== false) {
+        count += 1;
+        console.log({x, y, maxX, minX, maxY, minY});
+        if (y > maxY) maxY = y;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (x < minX) minX = x;
+      }
+    }
+  }
+  return count;
 }
 
 const answer1 = (input) => {
@@ -61,30 +84,18 @@ const answer1 = (input) => {
   // 22,0
 
   let maxY = 0;
-  for (let x = 19; x < 20; x++) {
-    for (let y = 0; y < 10000; y++) {
-      const thisMaxY = launch(x, y, target);
-      if (thisMaxY > maxY) {
-        maxY = thisMaxY;
-        console.log({x, y, maxY})
-      }
+  const x = 19; // figured out through guess & check
+  for (let y = 0; y < 10000; y++) { // let's check a buncha options, just to be safe
+    const thisMaxY = launch(x, y, target);
+    if (thisMaxY > maxY) {
+      maxY = thisMaxY;
+      console.log({x, y, maxY})
     }
   }
   return maxY;
-
-  // // TEST
-  // let maxY = 0;
-  // for (let x = 6; x < 10; x++) {
-  //   for (let y = 0; y < 10; y++) {
-  //     console.log({x, y});
-  //     maxY = Math.max(maxY, launch(x, y, target));
-  //     console.log(maxY);
-  //   }
-  // }
-  // return maxY;
 }
 
 const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
-console.log(answer1(f));
+console.log(answer2(f));
