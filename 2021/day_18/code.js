@@ -60,7 +60,6 @@ class SnailfishNumber {
   }
 
   explode() {
-    // console.log('exploding', this.toString());
     this.updateNextLeft(this.left);
     this.updateNextRight(this.right);
 
@@ -79,6 +78,11 @@ class SnailfishNumber {
 
     this.left = newLeft;
     this.right = newRight;
+  }
+
+  magnitude() {
+    if (this.isLeaf()) return this.value;
+    return 3 * this.left.magnitude() + 2 * this.right.magnitude();
   }
 
   toString() {
@@ -101,7 +105,6 @@ const getFirstDeepest = (root, depth=0) => {
 }
 
 const condition1 = (root) => {
-  // console.log('checking condition 1', root.toString());
   const node = getFirstDeepest(root);
   if (node) {
     node.explode();
@@ -111,9 +114,7 @@ const condition1 = (root) => {
 }
 
 const condition2 = (root) => {
-  // console.log('checking condition 2', root.toString());
   if (root.value > 9) {
-    // console.log('split', root.toString());
     root.split();
     return true;
   }
@@ -133,15 +134,12 @@ const reduce = (n) => {
   let split = false;
   let i = 0;
   while(exploded || split) {
-    // console.log(n.toString());
     exploded = condition1(n);
     if (!exploded) {
       split = condition2(n);
     }
     i++;
   }
-  // console.log('REDUCED NUMBER:')
-  // console.log(n.toString());
   return n;
 }
 
@@ -174,12 +172,29 @@ const parseInput = (input) => {
 
 const answer1 = (input) => {
   const sum = input.slice(1).reduce((sum, n) => reduce(add(sum, parseInput(n))), parseInput(input[0]));
-  // TODO: get magnitude
   console.log(sum.toString());
+  return sum.magnitude();
 }
 
-const FILENAME = 'test_input.txt';
+const answer2 = (input) => {
+  const pairs = [];
+  for (let i = 0; i < input.length; i++) {
+    for (let j = 0; j < input.length; j++) {
+      if (i === j) continue;
+      pairs.push([i, j]);
+    }
+  }
+
+  let max = -1;
+  pairs.forEach(([i, j]) => {
+    const magnitude = reduce(add(parseInput(input[i]), parseInput(input[j]))).magnitude();
+    if (magnitude > max) max = magnitude;
+  });
+  return max;
+}
+
+const FILENAME = 'input.txt';
 
 const f = fs.readFileSync(FILENAME, 'utf-8');
 const input = f.split('\n');
-console.log(answer1(input));
+console.log(answer2(input));
