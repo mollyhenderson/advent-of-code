@@ -13,8 +13,6 @@ class Distance {
     this.x = x;
     this.y = y;
     this.z = z;
-
-    this.dist = Math.sqrt(x^2 + y^2 + z^2);
   }
 
   equals(other) {
@@ -41,6 +39,8 @@ class Beacon {
   }
 
   hasXOverlappingNeighbors(other) {
+    // if this & other have 12 matching neighbor distances,
+    // we can assume they represent the same beacon
     const matchingNeighbors = this.neighbors.filter((_, i) => {
       const dist = this.distances[i];
       return other.distances.some(d => d.equals(dist));
@@ -74,8 +74,6 @@ class Scanner {
   }
 
   overlaps(other) {
-    // check if they have at least 12 overlapping beacons
-    // based on beacon neighbor distances
     for (const a of this.beacons) {
       for (const b of other.beacons) {
         if (a.hasXOverlappingNeighbors(b)) return true;
