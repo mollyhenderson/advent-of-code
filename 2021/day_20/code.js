@@ -34,10 +34,10 @@ const litPixelCount = (image) => image.reduce((sum, l) => sum + l.filter(p => p.
 
 const update = (image, algorithm) => {
   const newImage = [];
-  for (let i = 0; i < image.length; i++) {
+  for (let i = 1; i < image.length-1; i++) {
     const line = image[i];
     const newLine = [];
-    for (let j = 0; j < line.length; j++) {
+    for (let j = 1; j < line.length-1; j++) {
       newLine.push(line[j].update(algorithm));
     }
     newImage.push(newLine);
@@ -49,14 +49,14 @@ const getBlankLine = (len, iteration) => new Array(len).fill(0).map(_ => getBlan
 
 const setValues = (image, iteration) => {
   image = image.map(line => {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       line.unshift(getBlankPixel(iteration));
       line.push(getBlankPixel(iteration));
     }
     return line;
   });
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     image.unshift(getBlankLine(image[0].length, iteration));
     image.push(getBlankLine(image[0].length, iteration));
   }
@@ -84,20 +84,14 @@ const parseInput = (input) => {
 }
 
 const answer1 = (input) => {
-  const REPEATS = 2;
+  const REPEATS = 50;
 
   let { image, algorithm } = parseInput(input);
 
-  console.log(imageToString(image));
-  console.log(litPixelCount(image));
-  console.log();
-
   for (let i = 0; i < REPEATS; i++) {
+    console.log(`ITERATION ${i}`);
     image = setValues(image, i);
     image = update(image, algorithm);
-    console.log(imageToString(image));
-    console.log(litPixelCount(image));
-    console.log();
   }
   return litPixelCount(image);
 }
