@@ -33,11 +33,11 @@ print(answer1(input))
 `
 
 program
-  .argument('<year>')
-  .argument('<day>')
+  .argument('<year>', 'YYYY')
+  .argument('<day>', 'DD')
   .addOption(new Option('-l, --language <language>', 'Which language to generate.').choices(Object.values(Languages)).default(Languages.JAVASCRIPT))
   .action((year, day, { language }) => {
-    const directory = path.join(process.cwd(), year, `day_${day}`)
+    const directory = path.join(process.cwd(), year, day)
 
     try {
       fs.mkdirSync(directory)
