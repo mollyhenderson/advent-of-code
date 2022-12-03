@@ -33,7 +33,17 @@ program
       const inputString = fs.readFileSync(inputFile, 'utf-8')
 
       const codeFile = path.join(directory, 'code.js')
-      const code = require(codeFile)
+      let code
+      try {
+      code = require(codeFile)
+      } catch (err) {
+        if (err.code === 'MODULE_NOT_FOUND') {
+          console.error('That js file does not exist!\nIf you are not using javascript, remember to supply the -l flag.')
+          return
+        }
+        console.error(err)
+        return
+      }
 
       const output = puzzleNum === '1' ? 
         code.answer1(inputString) : 
