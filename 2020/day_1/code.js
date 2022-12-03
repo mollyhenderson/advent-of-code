@@ -21,12 +21,12 @@ function answer2(input) {
   }
 }
 
-function readInput(filename) {
+export function readInput(filename) {
   const input = fs.readFileSync(filename, { encoding: 'utf8' });
   return input.split('\n');
 }
 
-function readInputAsInts(filename) {
+export function readInputAsInts(filename) {
   return readInput(filename).map(i => parseInt(i));
 }
 

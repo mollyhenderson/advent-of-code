@@ -1,4 +1,4 @@
-const { readInput } = require('../../utils');
+const { readInput } = require('../day_1/code');
 
 function answer1(inputs, down, right) {
   const arr = inputs.filter((_, index) => index % down === 0);
