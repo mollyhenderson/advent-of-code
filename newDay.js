@@ -1,11 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { program, Option } = require('commander')
-
-const Languages = {
-  JAVASCRIPT: 'javascript',
-  PYTHON: 'python'
-}
+const { Languages } = require('./utils/scriptUtils')
 
 const jsContents = `const utils = require('../../utils/utils')
 
