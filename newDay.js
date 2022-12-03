@@ -14,18 +14,13 @@ module.exports.answer1 = (input) => {
 }
 `
 
-// TODO: add python support to index.js & clean up this template
-const pyContents = `def answer2(lines):
+const pyContents = `import utils.helpers as helpers
+
+def answer2(filename):
   return 'This function is not yet implemented!'
 
-def answer1(lines):
+def answer1(filename):
   return 'This function is not yet implemented!'
-
-FILENAME = 'test_input.txt'
-
-f = open(FILENAME, 'r')
-input = f.read().split('\\n')
-print(answer1(input))
 `
 
 program
