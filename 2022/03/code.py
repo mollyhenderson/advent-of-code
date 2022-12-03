@@ -1,29 +1,23 @@
 import string
+import utils.helpers as helpers
 
 letters = list(string.ascii_lowercase + string.ascii_uppercase)
-
-def get_rucksacks(lines):
-  return [list(x) for x in lines]
 
 def priority(x):
   return letters.index(x) + 1
 
-def answer2(lines):
-  rucksacks = get_rucksacks(lines)
-
+def answer2(filename):
+  rucksacks = helpers.get_lines_from_file(filename)
   total = 0
   for i in range(0, len(rucksacks), 3):
     rucks = rucksacks[i:i+3]
-    
     shared = next(x for x in rucks[0] if x in rucks[1] and x in rucks[2])
-
     total += priority(shared)
   
   return total
 
-def answer1(lines):
-  rucksacks = get_rucksacks(lines)
-
+def answer1(filename):
+  rucksacks = helpers.get_lines_from_file(filename)
   total = 0
   for rucksack in rucksacks:
     center = len(rucksack) // 2
@@ -35,9 +29,3 @@ def answer1(lines):
     total += priority(shared)
 
   return total
-
-FILENAME = 'input.txt'
-
-f = open(FILENAME, 'r')
-input = f.read().split('\n')
-print(answer2(input))

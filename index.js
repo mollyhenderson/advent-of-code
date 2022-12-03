@@ -1,5 +1,6 @@
 const fs = require('fs')
-const path = require('path')
+const path = require('path').posix
+const { execSync } = require('child_process')
 const { program, Option } = require('commander')
 const { Languages } = require('./utils/scriptUtils')
 
@@ -13,14 +14,25 @@ program
   .action((year, day, { puzzleNum, input, prod, language }) => {
     const inputFileName = input ?? prod ? 'input.txt' : 'test_input.txt'
 
-    const directory = path.join(process.cwd(), year, day)
+    const directory = path.resolve(year, day)
     const inputFile = path.join(directory, inputFileName)
 
-    const inputString = fs.readFileSync(inputFile, 'utf-8')
-
     if (language === Languages.PYTHON) {
-      console.log('Sorry, python is not yet supported!')
+      try {
+        const cmd = ` \
+          py -c "import importlib; \
+          code = importlib.import_module('${year}.${day}.code'); \
+          print(code.answer${puzzleNum}('${inputFile}'))" \
+        `
+        const output = execSync(cmd)
+        console.log(output.toString())
+      } catch (err) {
+        console.error('Error running python script:', err)
+      }
     } else {
+      const inputString = fs.readFileSync(inputFile, 'utf-8')
+
+      const codeFile = path.join(directory, 'code.js')
       const code = require(codeFile)
 
       const output = puzzleNum === '1' ? 
