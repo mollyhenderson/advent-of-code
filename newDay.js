@@ -3,7 +3,7 @@ const path = require('path')
 const { program, Option } = require('commander')
 const { Languages } = require('./utils/scriptUtils')
 
-const jsContents = `const utils = require('../../utils/utils')
+const jsContents = `const utils = require('../../utils/helpers')
 
 module.exports.answer2 = (input) => {
   return 'This function is not yet implemented!'

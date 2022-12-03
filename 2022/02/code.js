@@ -1,4 +1,4 @@
-const utils = require('../../utils/utils')
+const helpers = require('../../utils/helpers')
 
 const secondTypeOfResultsMap = {
   A: {
@@ -19,7 +19,7 @@ const secondTypeOfResultsMap = {
 }
 
 module.exports.answer2 = (input) => {
-  const lines = utils.getLines(input)
+  const lines = helpers.getLines(input)
   return lines.reduce((sum, line) => {
     const [theirs, mine] = line.split(' ')
     return sum + secondTypeOfResultsMap[theirs][mine]
@@ -50,7 +50,7 @@ const resultsMap = {
 // 
 // Turns out it also made part 2 super simple, just had to draw another logic map
 module.exports.answer1 = (input) => {
-  const lines = utils.getLines(input)
+  const lines = helpers.getLines(input)
   return lines.reduce((sum, line) => {
     const [theirs, mine] = line.split(' ')
     return sum + resultsMap[theirs][mine]
