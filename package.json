@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "commander": "^9.4.1"
+  },
+  "name": "advent-of-code",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

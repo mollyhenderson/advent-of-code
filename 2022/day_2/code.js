@@ -1,4 +1,4 @@
-const fs = require('fs');
+const utils = require('../../utils/utils')
 
 const secondTypeOfResultsMap = {
   A: {
@@ -18,8 +18,9 @@ const secondTypeOfResultsMap = {
   },
 }
 
-const answer2 = (input) => {
-  return input.reduce((sum, line) => {
+module.exports.answer2 = (input) => {
+  const lines = utils.getLines(input)
+  return lines.reduce((sum, line) => {
     const [theirs, mine] = line.split(' ')
     return sum + secondTypeOfResultsMap[theirs][mine]
   }, 0)
@@ -48,15 +49,10 @@ const resultsMap = {
 // of programming
 // 
 // Turns out it also made part 2 super simple, just had to draw another logic map
-const answer1 = (input) => {
-  return input.reduce((sum, line) => {
+module.exports.answer1 = (input) => {
+  const lines = utils.getLines(input)
+  return lines.reduce((sum, line) => {
     const [theirs, mine] = line.split(' ')
     return sum + resultsMap[theirs][mine]
   }, 0)
 }
-
-const FILENAME = 'input.txt';
-
-const f = fs.readFileSync(FILENAME, 'utf-8');
-const input = f.split('\n');
-console.log(answer2(input));
