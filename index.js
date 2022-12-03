@@ -5,11 +5,11 @@ const { program } = require('commander')
 program
   .argument('<year>')
   .argument('<day>')
-  .requiredOption('-p, --puzzle <num>', 'Number of the puzzle')
-  .option('-t, --test', 'Turning on "test" automatically uses the test_input file.')
-  .option('-i, --input <file>', 'Name of the input file. Defaults to input.txt')
-  .action((year, day, { puzzle, test, input }) => {
-    const inputFileName = input ?? test ? 'test_input.txt' : 'input.txt'
+  .requiredOption('-n, --puzzle-num <puzzle>', 'Number of the puzzle')
+  .option('-i, --input <file>', 'Name of the input file. If not provided, will be determined by the prod flag.')
+  .option('-p, --prod', 'Production ready - use the official input file!')
+  .action((year, day, { puzzleNum, input, prod }) => {
+    const inputFileName = input ?? prod ? 'input.txt' : 'test_input.txt'
 
     const directory = path.join(process.cwd(), year, `day_${day}`)
     const codeFile = path.join(directory, 'code.js')
@@ -18,7 +18,7 @@ program
     const inputString = fs.readFileSync(inputFile, 'utf-8')
     const code = require(codeFile)
 
-    const output = puzzle === '1' ? 
+    const output = puzzleNum === '1' ? 
       code.answer1(inputString) : 
       code.answer2(inputString)
 
