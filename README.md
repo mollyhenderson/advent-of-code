@@ -1,7 +1,7 @@
 # Advent of Code
 
 ```
-// Create directory & boilerplate js for a new day's puzzle
+// Create directory & boilerplate for a new day's puzzle
 $ node newDay.js <year> <day>
 
 // Run a puzzle
