@@ -19,7 +19,12 @@ program
   .action((year, day) => {
     const directory = path.join(process.cwd(), year, `day_${day}`)
 
-    fs.mkdirSync(directory)
+    try {
+      fs.mkdirSync(directory)
+    } catch (err) {
+      console.error('Directory already exists! If you\'re sure you want to continue, please delete the directory first.', { directory })
+      return
+    }
 
     const codeFile = path.join(directory, 'code.js')
     const testInputFile = path.join(directory, 'test_input.txt')
