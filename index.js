@@ -12,7 +12,7 @@ program
   .option('-p, --prod', 'Production ready - use the official input file!')
   .addOption(new Option('-l, --language <language>', 'Which language to run.').choices(Object.values(Languages)).default(Languages.JAVASCRIPT))
   .action((year, day, { puzzleNum, input, prod, language }) => {
-    const inputFileName = input ?? prod ? 'input.txt' : 'test_input.txt'
+    const inputFileName = input ?? (prod ? 'input.txt' : 'test_input.txt')
 
     const directory = path.resolve(year, day)
     const inputFile = path.join(directory, inputFileName)
