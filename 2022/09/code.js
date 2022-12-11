@@ -21,7 +21,6 @@ const getBoundaries = (instructions) => {
   for (const instruction of instructions) {
     const [direction, count] = instruction
 
-
     switch(direction) {
       case 'L': {
         x -= count
@@ -48,31 +47,33 @@ const getBoundaries = (instructions) => {
   return { minX, maxX, minY, maxY }
 }
 
-// const adjacent = (headX, headY, tailX, tailY) => {
-//   return (
-//     headX - 1 <= tailX && tailX <= headX + 1 &&
-//     headY - 1 <= tailY && tailY <= headY + 1
-//   )
-// }
-
 const maybeMoveTail = (headX, headY, tailX, tailY) => {
   if (headX > tailX + 1) {
     tailX++
-    tailY = headY
+    headY > tailY ? tailY++ : headY < tailY ? tailY-- : ''
   }
   if (headX < tailX - 1) {
     tailX--
-    tailY = headY
+    headY > tailY ? tailY++ : headY < tailY ? tailY-- : ''
   }
   if (headY > tailY + 1) {
     tailY++
-    tailX = headX
+    headX > tailX ? tailX++ : headX < tailX ? tailX-- :  ''
   }
   if (headY < tailY - 1) {
     tailY--
-    tailX = headX
+    headX > tailX ? tailX++ : headX < tailX ? tailX-- :  ''
   }
   return { tailX, tailY }
+}
+
+const moveRope = (rope) => {
+  for (let i = 1; i < rope.length; i++) {
+    const { tailX, tailY } = maybeMoveTail(rope[i-1][0], rope[i-1][1], rope[i][0], rope[i][1])
+    rope[i][0] = tailX
+    rope[i][1] = tailY
+  }
+  return rope
 }
 
 const print = (grid) => {
@@ -96,8 +97,80 @@ const printRope = (grid, headX, headY, tailX, tailY) => {
   console.log('\n')
 }
 
+const printLongRope = (grid, rope) => {
+  return
+
+  const newGrid = []
+  for (let i = grid.length - 1; i >= 0; i--) {
+    const line = grid[i]
+    const newLine = line.map(x => '.')
+    newGrid.push(newLine)
+  }
+
+  rope.forEach((knot, num) => {
+    const [x, y] =  knot
+    newGrid[y][x] = num
+  })
+
+  print(newGrid)
+  console.log('\n')
+}
+
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const instructions = parseInput(input)
+  const { minX, maxX, minY, maxY } = getBoundaries(instructions)
+
+  const line = helpers.times(maxX - minX + 1, i => 0)
+  const grid = helpers.times(maxY - minY + 1, i => [...line])
+
+  const rope = helpers.times(10, i => [minX * -1, minY * -1])
+
+  let tail = rope[rope.length-1]
+  grid[tail[1]][tail[0]] = 1
+  for (const instruction of instructions) {
+    const [direction, count] = instruction
+
+    switch(direction) {
+      case 'L':
+        helpers.times(count, i => {
+          rope[0][0]--
+          moveRope(rope)
+          let tail = rope[rope.length-1]
+          grid[tail[1]][tail[0]] = 1
+        })
+        printLongRope(grid, rope);
+        break
+      case 'R':
+        helpers.times(count, i => {
+          rope[0][0]++
+          moveRope(rope)
+          let tail = rope[rope.length-1]
+          grid[tail[1]][tail[0]] = 1
+        })
+        printLongRope(grid, rope);
+        break
+      case 'D':
+        helpers.times(count, i => {
+          rope[0][1]--
+          moveRope(rope)
+          let tail = rope[rope.length-1]
+          grid[tail[1]][tail[0]] = 1
+        })
+        printLongRope(grid, rope);
+        break
+      case 'U':
+        helpers.times(count, i => {
+          rope[0][1]++
+          moveRope(rope)
+          let tail = rope[rope.length-1]
+          grid[tail[1]][tail[0]] = 1
+        })
+        printLongRope(grid, rope);
+        break
+    }
+  }
+  print(grid)
+  return grid.flatMap(x => x).reduce((sum, value) => sum + value, 0)
 }
 
 module.exports.answer1 = (input) => {
