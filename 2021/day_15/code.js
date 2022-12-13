@@ -1,5 +1,5 @@
 const fs = require('fs');
-const PriorityQueue = require('./pq');
+const PriorityQueue = require('../../utils/pq');
 
 let id = 0;
 

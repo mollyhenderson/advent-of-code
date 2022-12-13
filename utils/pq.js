@@ -66,4 +66,11 @@ module.exports = class PriorityQueue {
       node = maxChild;
     }
   }
+
+  // This is an unsanctioned function!!
+  reprioritizeFirstMatch(predicate) {
+    const i = this._heap.findIndex(predicate)
+    const removed = this._heap.splice(i)
+    this.push(...removed)
+  }
 }
