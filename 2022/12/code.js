@@ -3,7 +3,6 @@ const PriorityQueue = require('../../utils/pq')
 
 class Node {
   char
-  initial = false
   destination = false
   visited = false
   distance = Infinity
@@ -14,7 +13,6 @@ class Node {
   constructor(char, position) {
     this.char = char
     if (char === 'S') {
-      this.initial = true
       this.distance = 0
       char = 'a'
     }
@@ -36,6 +34,16 @@ const parseInput = (input) => {
   return lines.map((l, y) => 
     helpers.getCharacters(l).map((c, x) => 
       new Node(c, [x, y])))
+}
+
+const parseInput2 = (input) => {
+  const map = parseInput(input)
+  for (const line of map) {
+    for (const node of line) {
+      if (node.elevation === 0) node.distance = 0
+    }
+  }
+  return map
 }
 
 // From 2021, day 15
@@ -80,7 +88,15 @@ const dijkstra = (map) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const map = parseInput2(input)
+  let node = dijkstra(map)
+
+  let count = 0
+  while (node.prev) {
+    count++
+    node = node.prev
+  }
+  return count
 }
 
 module.exports.answer1 = (input) => {
