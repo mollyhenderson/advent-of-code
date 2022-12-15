@@ -27,7 +27,17 @@ const getRocks = (input) => {
   return rocks
 }
 
-const parseInput = (input) => {
+const getGrid = (puzzle) => {
+
+
+  return grid
+}
+
+const parseInput2 = (input) => {
+  return parseInput(input, 2)
+}
+
+const parseInput = (input, puzzle = 1) => {
   const rocks = getRocks(input)
 
   const allX = rocks.flatMap(x => x).map(([x,]) => x)
@@ -35,14 +45,27 @@ const parseInput = (input) => {
 
   const minY = 0
   const maxY = Math.max(...allY)
-  const minX = Math.min(...allX)
-  const maxX = Math.max(...allX)
+  const minX = Math.min(500-maxY, ...allX)
+  const maxX = Math.max(500+maxY, ...allX)
 
-  // console.log({minX, maxX, minY, maxY})
-
-  const grid = helpers.times(maxY + 1, () => 
+  let grid
+  let xOffset
+  if (puzzle === 1) {
+    xOffset = minX
+    grid = helpers.times(maxY + 1, () => 
     helpers.times(maxX - minX + 1, () => 
       '.'))
+  } else {
+    // These numbers are ridiculous and not necessary
+    // But it _works_
+    xOffset = minX - Math.ceil((maxY - minY) / 2)
+    const xLength = (maxX - minX + 1) + (maxY - minY * 3 + 2)
+    grid = helpers.times(maxY + 2, () =>
+    helpers.times(xLength, () => 
+      '.'))
+    
+    grid[grid.length] = helpers.times(xLength, () => '#')
+  }
   
   for (const rock of rocks) {
     for (let i = 0; i < rock.length - 1; i++) {
@@ -52,26 +75,26 @@ const parseInput = (input) => {
 
       // whoa this is...janky?
       while (startX > endX) {
-        grid[startY][startX-minX] = '#'
+        grid[startY][startX-xOffset] = '#'
         startX--
       }
       while (startX < endX) {
-        grid[startY][startX-minX] = '#'
+        grid[startY][startX-xOffset] = '#'
         startX++
       }
       while (startY > endY) {
-        grid[startY][startX-minX] = '#'
+        grid[startY][startX-xOffset] = '#'
         startY--
       }
       while (startY < endY) {
-        grid[startY][startX-minX] = '#'
+        grid[startY][startX-xOffset] = '#'
         startY++
       }
-      grid[endY][endX-minX] = '#'
+      grid[endY][endX-xOffset] = '#'
     }
   }
 
-  return { grid, minX }
+  return { grid, xOffset }
 }
 
 const fall = (grid, x, y) => {
@@ -103,6 +126,7 @@ const fallSand = (grid, from) => {
     const [x, y] = res
     grid[y][x] = 'o'
     count++
+    if (res[0] === from[0] && res[1] === from[1]) break
   }
 
   print(grid)
@@ -111,11 +135,13 @@ const fallSand = (grid, from) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const {grid, xOffset} = parseInput2(input)
+  print(grid)
+  return fallSand(grid, [500-xOffset, 0])
 }
 
 module.exports.answer1 = (input) => {
-  const {grid, minX} = parseInput(input)
-  // print(grid)
-  return fallSand(grid, [500-minX, 0])
+  const {grid, xOffset} = parseInput(input)
+  print(grid)
+  return fallSand(grid, [500-xOffset, 0])
 }
