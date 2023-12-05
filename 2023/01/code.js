@@ -1,57 +1,38 @@
-const { getLines, getCharacters, int } = require("../../utils/helpers")
+const { getLines, getCharacters, int } = require('../../utils/helpers')
 
 const isInt = (c) => c == int(c)
-
-const firstNumber = (line) => {
-  const numbers = [
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-    "nine",
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-  ]
-  const firsts = numbers.map((n) => line.indexOf(n))
-
-  let min = Infinity
-  let minIndex = Infinity
-  for (let i = 0; i < firsts.length; i++) {
-    const num = firsts[i]
-    if (num === -1) continue
-
-    if (num < min) {
-      min = num
-      minIndex = i
-    }
-  }
-
-  if (minIndex < 9) return minIndex + 1
-  return minIndex - 8
-}
+const reverseString = (s) => s.split('').reverse().join('')
 
 module.exports.answer2 = (input) => {
+  const numbers = {
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+  }
+  const regexString = Object.keys(numbers).join('|')
+  const regex = RegExp(regexString, 'g')
+  const backwardsRegex = RegExp(reverseString(regexString), 'g')
+
   let out = 0
   getLines(input).forEach((line) => {
-    const first = firstNumber(line)
-    // TODO: this doesn't work because now the words are backwards! silly me
-    const last = firstNumber(line.split('').reverse().join(''))
+    const firstLine = line.replaceAll(regex, (match) => numbers[match])
+    const first = firstLine.split('').find(isInt)
+
+    const lastLine = reverseString(line).replaceAll(
+      backwardsRegex,
+      (match) => numbers[reverseString(match)]
+    )
+    const last = lastLine.split('').find(isInt)
 
     const num = int(`${first}${last}`)
     out += num
   })
-
   return out
 }
 
@@ -64,6 +45,5 @@ module.exports.answer1 = (input) => {
     const num = int(`${first}${last}`)
     out += num
   })
-
   return out
 }
