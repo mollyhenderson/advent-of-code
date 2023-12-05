@@ -6,6 +6,48 @@ const int = (str) => parseInt(str, 10)
 
 const times = (num, cb) => [...Array(num)].map((_, i) => cb(i))
 
+class SafeMatrix {
+  constructor(input, fallback) {
+    this.matrix = getLines(input).map(getCharacters)
+    this.fallback = fallback
+  }
+
+  lineAt(y) {
+    return y >= 0 && y < this.height() ? this.matrix[y] : []
+  }
+
+  get(x, y) {
+    if (
+      y < 0 ||
+      y >= this.matrix.length ||
+      x < 0 ||
+      x >= this.matrix[y].length
+    ) {
+      return this.fallback
+    }
+    return this.matrix[y][x]
+  }
+
+  checkAround(x, y, predicate) {
+    for (let i = y - 1; i <= y + 1; i++) {
+      for (let j = x - 1; j <= x + 1; j++) {
+        if (predicate(this.get(j, i))) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  height() {
+    return this.matrix.length
+  }
+
+  width(y) {
+    return y >= 0 && y < this.height() ? this.matrix[y].length : 0
+  }
+}
+
 class GrowingMap {
   #map
   #fillChar
@@ -15,10 +57,10 @@ class GrowingMap {
   #maxY = 0
   #maxX = 0
 
-  constructor (fillChar = 0) {
+  constructor(fillChar = 0) {
     this.#fillChar = fillChar
     this.#map = {
-      0: { 0: this.#fillChar }
+      0: { 0: this.#fillChar },
     }
   }
 
@@ -50,11 +92,15 @@ class GrowingMap {
 
     while (x < this.#minX) {
       this.#minX--
-      Object.values(this.#map).forEach(row => row[this.#minX] = this.#fillChar)
+      Object.values(this.#map).forEach(
+        (row) => (row[this.#minX] = this.#fillChar)
+      )
     }
     while (x > this.#maxX) {
       this.#maxX++
-      Object.values(this.#map).forEach(row => row[this.#maxX] = this.#fillChar)
+      Object.values(this.#map).forEach(
+        (row) => (row[this.#maxX] = this.#fillChar)
+      )
     }
   }
 
@@ -75,5 +121,6 @@ module.exports = {
   getCharacters,
   int,
   times,
+  SafeMatrix,
   GrowingMap,
 }
