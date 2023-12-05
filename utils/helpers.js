@@ -6,14 +6,35 @@ const int = (str) => parseInt(str, 10)
 
 const times = (num, cb) => [...Array(num)].map((_, i) => cb(i))
 
+let id = 0
+class Node {
+  count = 0
+  value = 1
+
+  constructor(c) {
+    this.id = id++
+    this.character = c
+  }
+
+  get val() {
+    return this.character
+  }
+
+  toString() {
+    return this.count
+  }
+}
 class SafeMatrix {
   constructor(input, fallback) {
-    this.matrix = getLines(input).map(getCharacters)
+    this.matrix = getLines(input).map((line) => {
+      const chars = getCharacters(line)
+      return chars.map((c) => new Node(c))
+    })
     this.fallback = fallback
   }
 
-  lineAt(y) {
-    return y >= 0 && y < this.height() ? this.matrix[y] : []
+  rawLine(y) {
+    return y >= 0 && y < this.height() ? this.matrix[y].map((x) => x.val) : []
   }
 
   get(x, y) {
@@ -25,7 +46,7 @@ class SafeMatrix {
     ) {
       return this.fallback
     }
-    return this.matrix[y][x]
+    return this.matrix[y][x].val
   }
 
   checkAround(x, y, predicate) {
@@ -37,6 +58,27 @@ class SafeMatrix {
       }
     }
     return false
+  }
+
+  findPositionAround(x, y, predicate) {
+    for (let i = y - 1; i <= y + 1; i++) {
+      for (let j = x - 1; j <= x + 1; j++) {
+        if (predicate(this.get(j, i))) {
+          return { x: j, y: i }
+        }
+      }
+    }
+    return false
+  }
+
+  increment(x, y) {
+    const node = this.matrix[y][x]
+    node.count++
+  }
+
+  multiplyValue(x, y, val) {
+    const node = this.matrix[y][x]
+    node.value *= val
   }
 
   height() {
