@@ -45,14 +45,14 @@ const HandTypes = {
 }
 
 class Hand {
-  constructor(line) {
+  constructor(line, part2 = false) {
     const [cards, bid] = line.split(' ')
     this.cards = cards.split('')
     this.bid = int(bid)
+    this.handType = part2 ? this.type2() : this.type()
   }
 
   type2() {
-    console.log('--- TYPE FOR HAND:', this.cards)
     if (!this.cards.includes('J')) return this.type()
 
     let highest = HandTypes.HIGH
@@ -67,9 +67,9 @@ class Hand {
       // look I know the naming is bad
       if (type < highest) {
         highest = type
-        console.log('!! updating type', {highest, replacement})
       }
     })
+    return highest
   }
 
   type() {
@@ -110,17 +110,15 @@ const getType = (cards) => {
   return HandTypes.HIGH
 }
 
-const parseInput = (input) => {
+const parseInput = (input, part2) => {
   const lines = getLines(input)
-  return lines.map((l) => new Hand(l))
+  return lines.map((l) => new Hand(l, part2))
 }
 
 const rankHands = (hands, part2 = false) => {
   hands.sort((a, b) => {
-    const typeFn = part2 ? 'type2' : 'type'
-
-    const typeA = a[typeFn]()
-    const typeB = b[typeFn]()
+    const typeA = a.handType
+    const typeB = b.handType
     if (typeA !== typeB) {
       return typeB - typeA
     }
@@ -141,9 +139,8 @@ const rankHands = (hands, part2 = false) => {
 }
 
 module.exports.answer2 = (input) => {
-  const hands = parseInput(input)
+  const hands = parseInput(input, true)
   rankHands(hands, true)
-  console.log(hands)
 
   return hands
     .map((h, i) => h.bid * (i + 1))
