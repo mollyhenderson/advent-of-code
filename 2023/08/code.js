@@ -25,35 +25,24 @@ class Network {
   }
 }
 
-const followPath = ({ start, end, instructions, network, distance = 0 }) => {
-  if (start === end) {
-    return { distance }
-  }
+const followPath = ({ start, end, instructions, network }) => {
+  const initialInstructions = [...instructions]
 
-  if (!instructions.length) {
-    instructions = network.initialInstructions
-  }
+  let distance = 0
+  while (true) {
+    if (start === end) {
+      return { distance }
+    }
 
-  const modifiedInstructions = [...instructions]
-  const instruction = modifiedInstructions.shift()
-  const node = network.get(start)
+    if (!instructions.length) {
+      instructions = [...initialInstructions]
+    }
+    const instruction = instructions.shift()
+    const node = network.get(start)
 
-  if (instruction === 'L') {
-    return followPath({
-      start: node.left,
-      end,
-      instructions: modifiedInstructions,
-      network,
-      distance: distance + 1,
-    })
+    distance += 1
+    start = instruction === 'L' ? node.left : node.right
   }
-  return followPath({
-    start: node.right,
-    end,
-    instructions: modifiedInstructions,
-    network,
-    distance: distance + 1,
-  })
 }
 
 const parseInput = (input) => {
@@ -74,5 +63,5 @@ module.exports.answer1 = (input) => {
     end: 'ZZZ',
     instructions,
     network,
-  })
+  }).distance
 }
