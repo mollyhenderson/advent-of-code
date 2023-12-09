@@ -2,7 +2,7 @@ const { getLines } = require('../../utils/helpers')
 
 class Node {
   constructor(line) {
-    const [id, left, right] = line.match(/[A-Z]{3}/g)
+    const [id, left, right] = line.match(/[A-Z0-9]{3}/g)
     this.id = id
     this.left = left
     this.right = right
@@ -10,8 +10,7 @@ class Node {
 }
 
 class Network {
-  constructor(lines, initialInstructions) {
-    this.initialInstructions = initialInstructions
+  constructor(lines) {
     this.nodes = Object.fromEntries(
       lines.map((l) => {
         const node = new Node(l)
@@ -22,6 +21,10 @@ class Network {
 
   get(id) {
     return this.nodes[id]
+  }
+
+  filter(pred) {
+    return Object.values(this.nodes).filter(pred)
   }
 }
 
@@ -49,7 +52,7 @@ const parseInput = (input) => {
   const lines = getLines(input)
   const instructions = lines.shift().split('')
   lines.shift()
-  return { instructions, network: new Network(lines, instructions) }
+  return { instructions, network: new Network(lines) }
 }
 
 module.exports.answer2 = (input) => {
