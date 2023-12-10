@@ -57,25 +57,25 @@ const followPath = ({ start, end, instructions, network }) => {
 }
 
 const followPaths = ({ instructions, network }) => {
-  const initialInstructions = [...instructions]
-
+  // const initialInstructions = [...instructions]
+  let instructionIndex = 0
   let starts = network.nodeIds().filter((id) => id.endsWith('A'))
-
   let distance = 0
   while (true) {
-    if (distance % 1000 === 0) console.log(distance)
+    if (distance % 100000000 === 0) console.log(distance)
 
     if (starts.every((id) => id.endsWith('Z'))) {
       return { distance }
     }
 
-    if (!instructions.length) {
-      instructions = [...initialInstructions]
+    if (instructionIndex === instructions.length) {
+      instructionIndex = 0
     }
-    const instruction = instructions.shift()
+    const instruction = instructions[instructionIndex]
     const nodes = network.getMany(starts)
 
     distance += 1
+    instructionIndex += 1
     const dir = instruction === 'L' ? 'left' : 'right'
     starts = nodes.map((n) => n[dir])
   }
