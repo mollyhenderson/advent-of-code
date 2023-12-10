@@ -6,7 +6,9 @@ const int = (str) => parseInt(str, 10)
 
 const times = (num, cb) => [...Array(num)].map((_, i) => cb(i))
 
-const parseNumbers = (input) => input.match(/(\d+)/g).map(int)
+const parseNumbers = (input) => input.match(/(-*\d+)/g).map(int)
+
+const sum = (input) => input.reduce((sum, curr) => sum + curr, 0)
 
 let id = 0
 class Node {
@@ -166,6 +168,7 @@ module.exports = {
   int,
   times,
   parseNumbers,
+  sum,
   SafeMatrix,
   GrowingMap,
 }
