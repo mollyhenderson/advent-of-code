@@ -39,7 +39,10 @@ const getNextSequence = (seq) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const sequences = parseInput(input)
+  sequences.forEach(s => s.numbers.reverse())
+  const nexts = sequences.map((s) => s.predictNext())
+  return sum(nexts)
 }
 
 module.exports.answer1 = (input) => {
