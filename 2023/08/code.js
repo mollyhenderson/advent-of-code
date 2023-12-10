@@ -11,7 +11,7 @@ class Node {
 
 class Network {
   constructor(lines) {
-    this.nodes = Object.fromEntries(
+    this._nodes = Object.fromEntries(
       lines.map((l) => {
         const node = new Node(l)
         return [node.id, node]
@@ -20,11 +20,19 @@ class Network {
   }
 
   get(id) {
-    return this.nodes[id]
+    return this._nodes[id]
   }
 
-  filter(pred) {
-    return Object.values(this.nodes).filter(pred)
+  getMany(ids) {
+    return ids.map((id) => this.get(id))
+  }
+
+  nodes() {
+    return Object.values(this._nodes)
+  }
+
+  nodeIds() {
+    return this.nodes().map((n) => n.id)
   }
 }
 
@@ -48,6 +56,31 @@ const followPath = ({ start, end, instructions, network }) => {
   }
 }
 
+const followPaths = ({ instructions, network }) => {
+  const initialInstructions = [...instructions]
+
+  let starts = network.nodeIds().filter((id) => id.endsWith('A'))
+
+  let distance = 0
+  while (true) {
+    if (distance % 1000 === 0) console.log(distance)
+
+    if (starts.every((id) => id.endsWith('Z'))) {
+      return { distance }
+    }
+
+    if (!instructions.length) {
+      instructions = [...initialInstructions]
+    }
+    const instruction = instructions.shift()
+    const nodes = network.getMany(starts)
+
+    distance += 1
+    const dir = instruction === 'L' ? 'left' : 'right'
+    starts = nodes.map((n) => n[dir])
+  }
+}
+
 const parseInput = (input) => {
   const lines = getLines(input)
   const instructions = lines.shift().split('')
@@ -56,7 +89,11 @@ const parseInput = (input) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const { instructions, network } = parseInput(input)
+  return followPaths({
+    instructions,
+    network,
+  }).distance
 }
 
 module.exports.answer1 = (input) => {
