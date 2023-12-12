@@ -36,12 +36,13 @@ class Network {
   }
 }
 
-const followPath = ({ start, end, instructions, network }) => {
+const followPath = ({ start, endCondition, instructions, network }) => {
+  instructions = [...instructions]
   const initialInstructions = [...instructions]
 
   let distance = 0
   while (true) {
-    if (start === end) {
+    if (endCondition(start)) {
       return { distance }
     }
 
@@ -57,7 +58,6 @@ const followPath = ({ start, end, instructions, network }) => {
 }
 
 const followPaths = ({ instructions, network }) => {
-  // const initialInstructions = [...instructions]
   let instructionIndex = 0
   let starts = network.nodeIds().filter((id) => id.endsWith('A'))
   let distance = 0
@@ -88,19 +88,48 @@ const parseInput = (input) => {
   return { instructions, network: new Network(lines) }
 }
 
+const minIndex = (nums) => {
+  let min = Infinity
+  let minIndex = -1
+  nums.forEach((n, i) => {
+    if (n < min) {
+      min = n
+      minIndex = i
+    }
+  })
+  return minIndex
+}
+
+const lcm = (nums) => {
+  const multiples = [...nums]
+  while (!multiples.every((n) => n === multiples[0])) {
+    const min = minIndex(multiples)
+    multiples[min] += nums[min]
+  }
+  return multiples[0]
+}
+
 module.exports.answer2 = (input) => {
   const { instructions, network } = parseInput(input)
-  return followPaths({
-    instructions,
-    network,
-  }).distance
+  const starts = network.nodes().filter((n) => n.id.endsWith('A'))
+
+  const dists = starts.map(
+    (n) =>
+      followPath({
+        start: n.id,
+        endCondition: (id) => id.endsWith('Z'),
+        instructions,
+        network,
+      }).distance
+  )
+  return lcm(dists)
 }
 
 module.exports.answer1 = (input) => {
   const { instructions, network } = parseInput(input)
   return followPath({
     start: 'AAA',
-    end: 'ZZZ',
+    endCondition: (id) => id === 'ZZZ',
     instructions,
     network,
   }).distance
