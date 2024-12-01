@@ -33,6 +33,7 @@ program
     try {
       fs.mkdirSync(directory)
     } catch (err) {
+      console.log(err)
       console.error('Directory already exists! If you\'re sure you want to continue, please delete the directory first.', { directory })
       return
     }

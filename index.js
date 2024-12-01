@@ -20,7 +20,7 @@ program
     if (language === Languages.PYTHON) {
       try {
         const cmd = ` \
-          py -c "import importlib; \
+          python3 -c "import importlib; \
           code = importlib.import_module('${year}.${day}.code'); \
           print(code.answer${puzzleNum}('${inputFile}'))" \
         `
