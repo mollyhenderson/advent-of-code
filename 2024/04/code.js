@@ -1,9 +1,29 @@
 const { getLines, getCharacters } = require('../../utils/helpers')
 
-const LETTERS = ['X', 'M', 'A', 'S']
+let LETTERS
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  LETTERS = ['M', 'A', 'S']
+  const matrix = getLines(input).map((l) => getCharacters(l))
+
+  let total = 0
+  for (let i = 0; i < matrix.length; i++) {
+    const line = matrix[i]
+    for (let j = 0; j < line.length; j++) {
+      if (checkUpLeft(matrix, j, i)) {
+        if (checkUpRight(matrix, j - 2, i) || checkDownLeft(matrix, j, i - 2)) {
+          total++
+        }
+      }
+      if (checkDownRight(matrix, j, i)) {
+        if (checkUpRight(matrix, j, i + 2) || checkDownLeft(matrix, j + 2, i)) {
+          total++
+        }
+      }
+    }
+  }
+
+  return total
 }
 
 const checkUp = (matrix, x, y, toCheck = [...LETTERS]) => {
@@ -95,6 +115,8 @@ const checkDownRight = (matrix, x, y, toCheck = [...LETTERS]) => {
 }
 
 module.exports.answer1 = (input) => {
+  LETTERS = ['X', 'M', 'A', 'S']
+
   const matrix = getLines(input).map((l) => getCharacters(l))
 
   let total = 0
