@@ -27,54 +27,55 @@ class Spot {
 }
 
 const move = ({ direction, spot, lab }) => {
-  spot.visit()
-  switch (direction) {
-    case 'UP': {
-      if (spot.y === 0) return
+  while (true) {
+    spot.visit()
+    switch (direction) {
+      case 'UP': {
+        if (spot.y === 0) return
 
-      const next = lab.get(spot.y - 1, spot.x)
-      if (next.isFree()) {
-        spot = next
-      } else {
-        direction = 'RIGHT'
+        const next = lab.get(spot.y - 1, spot.x)
+        if (next.isFree()) {
+          spot = next
+        } else {
+          direction = 'RIGHT'
+        }
+        break
       }
-      break
-    }
-    case 'DOWN': {
-      if (spot.y === lab.matrix.length - 1) return
+      case 'DOWN': {
+        if (spot.y === lab.matrix.length - 1) return
 
-      const next = lab.get(spot.y + 1, spot.x)
-      if (next.isFree()) {
-        spot = next
-      } else {
-        direction = 'LEFT'
+        const next = lab.get(spot.y + 1, spot.x)
+        if (next.isFree()) {
+          spot = next
+        } else {
+          direction = 'LEFT'
+        }
+        break
       }
-      break
-    }
-    case 'LEFT': {
-      if (spot.x === 0) return
+      case 'LEFT': {
+        if (spot.x === 0) return
 
-      const next = lab.get(spot.y, spot.x - 1)
-      if (next.isFree()) {
-        spot = next
-      } else {
-        direction = 'UP'
+        const next = lab.get(spot.y, spot.x - 1)
+        if (next.isFree()) {
+          spot = next
+        } else {
+          direction = 'UP'
+        }
+        break
       }
-      break
-    }
-    case 'RIGHT': {
-      if (spot.x === lab.matrix[0].length - 1) return
+      case 'RIGHT': {
+        if (spot.x === lab.matrix[0].length - 1) return
 
-      const next = lab.get(spot.y, spot.x + 1)
-      if (next.isFree()) {
-        spot = next
-      } else {
-        direction = 'DOWN'
+        const next = lab.get(spot.y, spot.x + 1)
+        if (next.isFree()) {
+          spot = next
+        } else {
+          direction = 'DOWN'
+        }
+        break
       }
-      break
     }
   }
-  move({ direction, spot, lab })
 }
 
 class Lab {
