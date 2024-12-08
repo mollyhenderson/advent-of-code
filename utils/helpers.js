@@ -13,9 +13,13 @@ const sum = (input) => input.reduce((sum, curr) => sum + curr, 0)
 // Basic node. Handles parsing input; can be extended to add additional functionality
 class Node {
   char
+  x
+  y
 
-  constructor(char) {
+  constructor(char, x, y) {
     this.char = char
+    this.x = x
+    this.y = y
   }
 
   toString() {
@@ -28,9 +32,21 @@ class Map {
   matrix
 
   constructor(input, nodeClass = Node) {
-    this.matrix = getLines(input).map((l) =>
-      getCharacters(l).map((c) => new nodeClass(c))
+    this.matrix = getLines(input).map((l, i) =>
+      getCharacters(l).map((c, j) => new nodeClass(c, j, i))
     )
+  }
+
+  height() {
+    return this.matrix.length
+  }
+
+  width(at = 0) {
+    return this.matrix[at].length
+  }
+
+  at(x, y) {
+    return this.matrix[y][x]
   }
 
   toString() {
