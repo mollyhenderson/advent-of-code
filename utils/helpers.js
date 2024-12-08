@@ -10,8 +10,36 @@ const parseNumbers = (input) => input.match(/(-*\d+)/g).map(int)
 
 const sum = (input) => input.reduce((sum, curr) => sum + curr, 0)
 
-let id = 0
+// Basic node. Handles parsing input; can be extended to add additional functionality
 class Node {
+  char
+
+  constructor(char) {
+    this.char = char
+  }
+
+  toString() {
+    return this.char
+  }
+}
+
+// Basic map. Handles parsing input; can be extended to add additional functionality.
+class Map {
+  matrix
+
+  constructor(input, nodeClass = Node) {
+    this.matrix = getLines(input).map((l) =>
+      getCharacters(l).map((c) => new nodeClass(c))
+    )
+  }
+
+  toString() {
+    return this.matrix.map((row) => row.join('')).join('\n')
+  }
+}
+
+let id = 0
+class CountNode {
   count = 0
   value = 1
 
@@ -32,7 +60,7 @@ class SafeMatrix {
   constructor(input, fallback) {
     this.matrix = getLines(input).map((line) => {
       const chars = getCharacters(line)
-      return chars.map((c) => new Node(c))
+      return chars.map((c) => new CountNode(c))
     })
     this.fallback = fallback
   }
@@ -163,6 +191,8 @@ class GrowingMap {
 }
 
 module.exports = {
+  Node,
+  Map,
   getLines,
   getCharacters,
   int,
