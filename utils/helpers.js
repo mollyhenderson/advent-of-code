@@ -10,6 +10,10 @@ const parseNumbers = (input) => input.match(/(-*\d+)/g).map(int)
 
 const sum = (input) => input.reduce((sum, curr) => sum + curr, 0)
 
+const isEven = (num) => num % 2 === 0
+
+const isOdd = (num) => num % 2 !== 0
+
 // Basic node. Handles parsing input; can be extended to add additional functionality
 class Node {
   char
@@ -47,6 +51,10 @@ class Map {
 
   at(x, y) {
     return this.matrix[y][x]
+  }
+
+  isInBounds(x, y) {
+    return y >= 0 && y < this.height() && x >= 0 && x < this.width(y)
   }
 
   toString() {
@@ -215,6 +223,8 @@ module.exports = {
   times,
   parseNumbers,
   sum,
+  isEven,
+  isOdd,
   SafeMatrix,
   GrowingMap,
 }
