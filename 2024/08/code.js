@@ -1,4 +1,4 @@
-const { groupBy, uniq, uniqBy } = require('lodash')
+const { groupBy, uniqBy } = require('lodash')
 const { Map, Node } = require('../../utils/helpers')
 
 class AntennaNode extends Node {
@@ -18,13 +18,7 @@ class AntennaMap extends Map {
   }
 }
 
-module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
-}
-
-module.exports.answer1 = (input) => {
-  const map = new AntennaMap(input)
-
+const getAntennaPairs = (map) => {
   // Apparently the plural "antennas" is used to refer to electrical equipment,
   // and "antennae" refers to the insect protuberances. I choose to imagine this
   // map containing insect protuberances!
@@ -40,6 +34,45 @@ module.exports.answer1 = (input) => {
       }
     }
   })
+  return pairs
+}
+
+module.exports.answer2 = (input) => {
+  const map = new AntennaMap(input)
+  const pairs = getAntennaPairs(map)
+
+  // Generate antinode coordinates
+  const antinodes = []
+  pairs.forEach(([a, b]) => {
+    let xDiff = a.x - b.x
+    let yDiff = a.y - b.y
+
+    let coords = { x: a.x, y: a.y }
+    while (map.isInBounds(coords.x, coords.y)) {
+      antinodes.push(coords)
+      coords = { x: coords.x - xDiff, y: coords.y - yDiff }
+    }
+
+    coords = { x: a.x, y: a.y }
+    while (map.isInBounds(coords.x, coords.y)) {
+      antinodes.push(coords)
+      coords = { x: coords.x + xDiff, y: coords.y + yDiff }
+    }
+  })
+
+  // antinodes.forEach((n) => (map.at(n.x, n.y).char = '#'))
+  // console.log(map.toString())
+
+  // lol my previous de-dupe implmentation had a bug that would erroneously
+  // consider { x:12, y:3 } equal to { x:1, y:23 }
+  const uniques = uniqBy(antinodes, (n) => `x:${n.x}y:${n.y}`)
+
+  return uniques.length
+}
+
+module.exports.answer1 = (input) => {
+  const map = new AntennaMap(input)
+  const pairs = getAntennaPairs(map)
 
   // Generate antinode coordinates
   const antinodes = []
