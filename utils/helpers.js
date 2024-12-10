@@ -57,6 +57,15 @@ class Map {
     return y >= 0 && y < this.height() && x >= 0 && x < this.width(y)
   }
 
+  neighbors(x, y) {
+    const neighbors = []
+    if (this.isInBounds(x - 1, y)) neighbors.push(this.at(x - 1, y))
+    if (this.isInBounds(x + 1, y)) neighbors.push(this.at(x + 1, y))
+    if (this.isInBounds(x, y - 1)) neighbors.push(this.at(x, y - 1))
+    if (this.isInBounds(x, y + 1)) neighbors.push(this.at(x, y + 1))
+    return neighbors
+  }
+
   toString() {
     return this.matrix.map((row) => row.join('')).join('\n')
   }
