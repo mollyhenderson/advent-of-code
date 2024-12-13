@@ -50,6 +50,7 @@ class Map {
   }
 
   at(x, y) {
+    if (!this.isInBounds(x, y)) return undefined
     return this.matrix[y][x]
   }
 
