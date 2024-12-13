@@ -42,6 +42,35 @@ class PerimeterSegment {
     this.direction = direction
   }
 
+  getNextStraights() {
+    switch (this.direction) {
+      case 'BELOW': {
+        return [
+          new PerimeterSegment(this.x - 1, this.y, this.direction),
+          new PerimeterSegment(this.x + 1, this.y, this.direction),
+        ]
+      }
+      case 'LEFT': {
+        return [
+          new PerimeterSegment(this.x, this.y - 1, this.direction),
+          new PerimeterSegment(this.x, this.y + 1, this.direction),
+        ]
+      }
+      case 'ABOVE': {
+        return [
+          new PerimeterSegment(this.x + 1, this.y, this.direction),
+          new PerimeterSegment(this.x - 1, this.y, this.direction),
+        ]
+      }
+      case 'RIGHT': {
+        return [
+          new PerimeterSegment(this.x, this.y + 1, this.direction),
+          new PerimeterSegment(this.x, this.y - 1, this.direction),
+        ]
+      }
+    }
+  }
+
   getNextStraight() {
     switch (this.direction) {
       case 'BELOW': {
@@ -65,24 +94,32 @@ class PerimeterSegment {
         return [
           new PerimeterSegment(this.x, this.y, 'LEFT'),
           new PerimeterSegment(this.x - 1, this.y + 1, 'RIGHT'),
+          new PerimeterSegment(this.x, this.y, 'RIGHT'),
+          new PerimeterSegment(this.x + 1, this.y + 1, 'LEFT'),
         ]
       }
       case 'LEFT': {
         return [
           new PerimeterSegment(this.x, this.y, 'ABOVE'),
           new PerimeterSegment(this.x - 1, this.y - 1, 'BELOW'),
+          new PerimeterSegment(this.x, this.y, 'BELOW'),
+          new PerimeterSegment(this.x - 1, this.y + 1, 'ABOVE'),
         ]
       }
       case 'ABOVE': {
         return [
           new PerimeterSegment(this.x, this.y, 'RIGHT'),
           new PerimeterSegment(this.x + 1, this.y - 1, 'LEFT'),
+          new PerimeterSegment(this.x, this.y, 'LEFT'),
+          new PerimeterSegment(this.x - 1, this.y - 1, 'RIGHT'),
         ]
       }
       case 'RIGHT': {
         return [
           new PerimeterSegment(this.x, this.y, 'BELOW'),
           new PerimeterSegment(this.x + 1, this.y + 1, 'ABOVE'),
+          new PerimeterSegment(this.x, this.y, 'ABOVE'),
+          new PerimeterSegment(this.x + 1, this.y - 1, 'BELOW'),
         ]
       }
     }
@@ -160,20 +197,22 @@ module.exports.answer2 = (input) => {
       const area = r.length
 
       let perimeterSegments = getPerimeterSegments(r, garden)
-      console.log(perimeterSegments)
+      // console.log(perimeterSegments)
 
       let segment = perimeterSegments.shift()
-      let sides = 0
+      let sides = 1
       // Segments will always be sorted such that the lower right corner is first
       // (Turns out that doesn't matter tho)
       while (segment) {
         // console.log({ segment, sides })
-        const maybeNext = segment.getNextStraight()
-        next = perimeterSegments.find((x) => x.equals(maybeNext))
+        const maybeNexts = segment.getNextStraights()
+        next = perimeterSegments.find(
+          (x) => x.equals(maybeNexts[0]) || x.equals(maybeNexts[1])
+        )
         if (!next) {
           const maybeNexts = segment.getNextTurns()
-          next = perimeterSegments.find(
-            (x) => x.equals(maybeNexts[0]) || x.equals(maybeNexts[1])
+          next = perimeterSegments.find((x) =>
+            maybeNexts.find((y) => x.equals(y))
           )
           if (next) {
             // We completed a side, moving to an adjacent side
@@ -182,11 +221,9 @@ module.exports.answer2 = (input) => {
         }
         if (!next) {
           // We completed a side, moving to another unconnected side
-          sides++
           next = perimeterSegments.shift()
-          console.log('STARTING ANEW', next)
-          // if (!next) sides++
-          // sides++
+          // console.log('STARTING ANEW', { next, sides })
+          if (next) sides++
         }
         segment = next
         perimeterSegments = perimeterSegments.filter((s) => !s.equals(segment))
@@ -199,7 +236,6 @@ module.exports.answer2 = (input) => {
       return area * sides
     })
   )
-  // 814906: too low
 }
 
 module.exports.answer1 = (input) => {
