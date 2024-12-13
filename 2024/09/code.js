@@ -1,10 +1,14 @@
-const { isEven, times } = require('../../utils/helpers')
+const { isEven, times, int } = require('../../utils/helpers')
 
 class Block {
   constructor(num, isFreeSpace, id) {
     this.num = parseInt(num)
     this.isFreeSpace = isFreeSpace
     if (!isFreeSpace) this.id = id
+  }
+
+  char() {
+    return this.isFreeSpace ? 0 : this.id
   }
 
   toString() {
@@ -30,26 +34,19 @@ const parseInput = (input) => {
 
 const blocksToString = (blocks) => blocks.map((b) => b.toString()).join('')
 
+const blocksToArray = (blocks) =>
+  blocks.flatMap((b) => times(b.num, () => b.char()))
+
 module.exports.answer2 = (input) => {
   const blocks = input
     .split('')
     .map((n, i) => new Block(n, i % 2 !== 0, Math.floor(i / 2)))
 
-  console.log(blocksToString(blocks))
+  // console.log(blocksToString(blocks))
 
   const newBlocks = []
-  let prevI = blocks.length - 1
   for (let i = blocks.length - 1; i >= 0; i--) {
-    if (i === prevI) {
-      console.log('!!!', i)
-    }
-    prevI = i
     const block = blocks[i]
-    // console.log({
-    //   block: block.toString(),
-    //   blocks: blocksToString(blocks),
-    //   newBlocks: blocksToString(newBlocks),
-    // })
     if (block.isFreeSpace) {
       newBlocks.unshift(block)
       continue
@@ -75,26 +72,9 @@ module.exports.answer2 = (input) => {
       newBlocks.unshift(block)
     }
   }
-
-  let next = newBlocks.at(-1)
-  while (next.isFreeSpace) {
-    newBlocks.pop()
-    next = newBlocks.at(-1)
-  }
-
   // console.log(blocksToString(newBlocks))
 
-  const arr = blocksToString(newBlocks).split('')
-
-  // console.log(newBlocks.slice(-10))
-
-  return blocksToString(newBlocks)
-    .split('')
-    .reduce((sum, n, i) => {
-      if (n == '.') return sum
-      return sum + parseInt(n) * i
-    }, 0)
-  // 86209591055: too low
+  return blocksToArray(newBlocks).reduce((sum, n, i) => sum + int(n) * i, 0)
 }
 
 module.exports.answer1 = (input) => {
