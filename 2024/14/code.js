@@ -1,4 +1,10 @@
+const { writeFileSync } = require('fs')
+const { generateSync } = require('text-to-image')
 const { getLines, Map, Node, times, int } = require('../../utils/helpers')
+
+const MAP_X = 101
+const MAP_Y = 103
+const SECS = 100
 
 class Robot {
   constructor(input) {
@@ -38,12 +44,10 @@ class Robot {
   }
 }
 
-class RobotMapNode extends Node {}
-
 class RobotMap extends Map {
   constructor(x, y) {
     super()
-    this.matrix = times(y, () => times(x, () => new RobotMapNode('.')))
+    this.matrix = times(y, () => times(x, () => '.'))
   }
 
   toStringWithRobots(robots) {
@@ -54,7 +58,7 @@ class RobotMap extends Map {
             const matchingRobots = robots.filter(
               (r) => r.position.x === x && r.position.y === y
             )
-            return matchingRobots.length > 0 ? matchingRobots.length : '.'
+            return matchingRobots.length > 0 ? '*' : '\xA0'
           })
           .join('')
       )
@@ -62,22 +66,40 @@ class RobotMap extends Map {
   }
 }
 
-const parseInput = (input, x, y) => {
-  const map = new RobotMap(x, y)
-  const robots = getLines(input).map((l) => new Robot(l))
-  return { map, robots }
+const parseInput = (input) => {
+  return getLines(input).map((l) => new Robot(l))
+}
+
+const writeToFile = (str, i) => {
+  const img = generateSync(str, {
+    fontSize: 24,
+    maxWidth: 800,
+    lineHeight: 5,
+  })
+  const data = img.replace(/^data:image\/\w+;base64,/, '')
+  const buf = Buffer.from(data, 'base64')
+  writeFileSync(
+    `/Users/mollyhenderson/git/advent-of-code/2024/14/output/${i}.png`,
+    buf
+  )
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const robots = parseInput(input)
+  const map = new RobotMap(MAP_X, MAP_Y)
+
+  let i = 1
+  while (i < 9000) {
+    for (const robot of robots) {
+      robot.move(MAP_X, MAP_Y)
+    }
+    writeToFile(map.toStringWithRobots(robots), i)
+    i++
+  }
 }
 
-const MAP_X = 101
-const MAP_Y = 103
-const SECS = 100
 module.exports.answer1 = (input) => {
-  // Turns out I didn't actually need the map!
-  const { map, robots } = parseInput(input, MAP_X, MAP_Y)
+  const robots = parseInput(input)
 
   for (const robot of robots) {
     for (let i = 1; i <= SECS; i++) {
