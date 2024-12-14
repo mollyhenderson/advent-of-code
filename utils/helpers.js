@@ -36,6 +36,7 @@ class Map {
   matrix
 
   constructor(input, nodeClass = Node) {
+    if (!input) return
     this.matrix = getLines(input).map((l, i) =>
       getCharacters(l).map((c, j) => new nodeClass(c, j, i))
     )
