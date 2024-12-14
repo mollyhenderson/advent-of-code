@@ -23,8 +23,8 @@ class ClawMachine {
     const {
       groups: { x, y },
     } = input[2].match(/X=(?<x>\d+), Y=(?<y>\d+)/)
-    this.x = int(x)
-    this.y = int(y)
+    this.x = int(x) + 10000000000000
+    this.y = int(y) + 10000000000000
   }
 }
 
@@ -38,7 +38,41 @@ const parseInput = (input) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const machines = parseInput(input)
+
+  let sum = 0
+  for (const machine of machines) {
+    console.log(machine)
+    const options = []
+    let aPresses = 0
+    while (true) {
+      if (aPresses % 1000 === 0) console.log(aPresses)
+      const x = machine.buttonA.x * aPresses
+      const y = machine.buttonA.y * aPresses
+      const remainderX = machine.x - x
+      const remainderY = machine.y - y
+
+      if (remainderX < 0 || remainderY < 0) {
+        break
+      }
+
+      const bPresses = remainderX / machine.buttonB.x
+
+      if (
+        Number.isInteger(bPresses) &&
+        remainderY / machine.buttonB.y === bPresses
+      ) {
+        options.push({ a: aPresses, b: bPresses })
+        break
+      }
+
+      aPresses++
+    }
+    if (options.length) {
+      sum += options[0].a * 3 + options[0].b
+    }
+  }
+  return sum
 }
 
 module.exports.answer1 = (input) => {
