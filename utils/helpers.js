@@ -55,6 +55,10 @@ class Map {
     return this.matrix[y][x]
   }
 
+  placeAt(x, y, node) {
+    this.matrix[y][x] = node
+  }
+
   isInBounds(x, y) {
     return y >= 0 && y < this.height() && x >= 0 && x < this.width(y)
   }
