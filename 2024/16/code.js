@@ -1,9 +1,18 @@
 const { getLines, Map, Node } = require('../../utils/helpers')
 const PriorityQueue = require('../../utils/pq')
 
+const DIR_CHAR_MAP = {
+  UP: '^',
+  DOWN: 'v',
+  LEFT: '<',
+  RIGHT: '>',
+}
+
 class MazeNode extends Node {
   distance = Infinity
   visited = false
+
+  prev = null
 
   notWall() {
     return this.char !== '#'
@@ -25,7 +34,7 @@ module.exports.answer2 = (input) => {
 
 const dijkstra = (maze) => {
   maze.start.distance = 0
-  maze.start.direction = 'LEFT'
+  maze.start.direction = 'RIGHT'
 
   const q = new PriorityQueue((a, b) => a.distance < b.distance)
   q.push(...maze.nodes().filter((n) => n.notWall()))
@@ -73,6 +82,7 @@ const dijkstra = (maze) => {
         if (newDistance < neighbor.distance) {
           neighbor.distance = newDistance
           neighbor.direction = newDirection
+          neighbor.prev = node
           q.reprioritizeFirstMatch((n) => neighbor.equals(n))
         }
       }
@@ -84,6 +94,12 @@ module.exports.answer1 = (input) => {
   const maze = new Maze(input)
 
   const res = dijkstra(maze)
+
+  // let node = res.prev
+  // while (node.prev) {
+  //   node.char = DIR_CHAR_MAP[node.direction]
+  //   node = node.prev
+  // }
+
   return res.distance
-  // 149628: too high
 }
