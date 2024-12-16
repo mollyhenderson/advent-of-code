@@ -26,6 +26,10 @@ class Node {
     this.y = y
   }
 
+  equals(other) {
+    return this.x === other.x && this.y === other.y && this.char === other.char
+  }
+
   toString() {
     return this.char
   }
@@ -40,6 +44,10 @@ class Map {
     this.matrix = getLines(input).map((l, i) =>
       getCharacters(l).map((c, j) => new nodeClass(c, j, i))
     )
+  }
+
+  nodes() {
+    return this.matrix.flat()
   }
 
   height() {
@@ -70,6 +78,21 @@ class Map {
     if (this.isInBounds(x, y - 1)) neighbors.push(this.at(x, y - 1))
     if (this.isInBounds(x, y + 1)) neighbors.push(this.at(x, y + 1))
     return neighbors
+  }
+
+  directionFrom(a, b) {
+    if (a.x === b.x && a.y > b.y) {
+      return 'UP'
+    }
+    if (a.x === b.x && a.y < b.y) {
+      return 'DOWN'
+    }
+    if (a.x > b.x && a.y === b.y) {
+      return 'LEFT'
+    }
+    if (a.x < b.x && a.y === b.y) {
+      return 'RIGHT'
+    }
   }
 
   toString() {
