@@ -86,18 +86,16 @@ class Computer {
     this.B = int(lines[1].match(/\d+/)[0])
     this.C = int(lines[2].match(/\d+/)[0])
 
-    const numbers = []
-    const matches = lines[4].matchAll(/(\d+),*/g)
-    for (const match of matches) {
-      numbers.push(int(match[1]))
-    }
+    this.program = lines[4].match(/(\d+,?)+/g)[0]
 
+    const numbers = this.program.split(',').map(int)
     for (let i = 0; i < numbers.length; i += 2) {
       this.instructions.push(new Instruction(numbers[i], numbers[i + 1], this))
     }
   }
 
   run() {
+    this.outputs = []
     this.index = 0
     while (this.index < this.instructions.length) {
       const output = this.instructions[this.index].run()
@@ -111,10 +109,21 @@ class Computer {
   output(num) {
     this.outputs.push(num)
   }
+
+  findA() {
+    let a = 0
+    while (true) {
+      if (a % 100 === 0) console.log(`A: ${a}`)
+      this.A = a
+      const out = this.run()
+      if (out === this.program) return a
+      a++
+    }
+  }
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  return new Computer(input).findA()
 }
 
 module.exports.answer1 = (input) => {
