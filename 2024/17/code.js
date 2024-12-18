@@ -72,6 +72,74 @@ class Instruction {
     }
     return true
   }
+
+  runBackward() {
+    switch (this.instruction) {
+      case 0: {
+        if (this.operand === 4) {
+          throw new Error("Whoops, didn't handle this case!")
+        }
+        this.computer.A = this.computer.A * 2 ** this.comboOperand
+        break
+      }
+      case 1: {
+        console.log('Ignoring instruction 1')
+        break
+      }
+      case 2: {
+        console.log('Ignoring instruction 2')
+        break
+      }
+      case 3: {
+        // Jump. This is a no-op when running backward.
+        break
+      }
+      case 4: {
+        console.log('Ignoring instruction 4')
+        break
+      }
+      case 5: {
+        // Technically the register could be set to any x s.t. x%8 === expected.
+        // But we're gonna see if this works!
+        const expected = this.computer.getNextExpectedOutput()
+        switch (this.operand) {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+            if (this.operand % 8 !== expected) {
+              throw new Error('Something has gone wrong!')
+            }
+            break
+          case 4:
+            if (this.computer.A % 8 !== expected) {
+              console.log({ value: this.computer.A, expected })
+              throw new Error('Something has gone wrong!')
+            }
+            this.computer.A = expected
+            break
+          case 5:
+            this.computer.B = expected
+            break
+          case 6:
+            this.computer.C = expected
+            break
+          default:
+            console.log('SOMETHING WENT WRONG HERE')
+        }
+        break
+      }
+      case 6: {
+        console.log('Ignoring instruction 6')
+        break
+      }
+      case 7: {
+        console.log('Ignoring instruction 7')
+        break
+      }
+    }
+    return true
+  }
 }
 
 class Computer {
@@ -86,11 +154,15 @@ class Computer {
     this.B = int(lines[1].match(/\d+/)[0])
     this.C = int(lines[2].match(/\d+/)[0])
 
-    this.program = lines[4].match(/(\d+,?)+/g)[0]
+    this.program = lines[4]
+      .match(/(\d+,?)+/g)[0]
+      .split(',')
+      .map(int)
 
-    const numbers = this.program.split(',').map(int)
-    for (let i = 0; i < numbers.length; i += 2) {
-      this.instructions.push(new Instruction(numbers[i], numbers[i + 1], this))
+    for (let i = 0; i < this.program.length; i += 2) {
+      this.instructions.push(
+        new Instruction(this.program[i], this.program[i + 1], this)
+      )
     }
   }
 
@@ -110,6 +182,10 @@ class Computer {
     this.outputs.push(num)
   }
 
+  getNextExpectedOutput() {
+    return this.outputs.pop()
+  }
+
   findA() {
     let a = 0
     while (true) {
@@ -120,10 +196,36 @@ class Computer {
       a++
     }
   }
+
+  findA2() {
+    // work backwards
+    this.A = 0
+    this.B = 0
+    this.C = 0
+    this.index = this.instructions.length - 1
+    this.outputs = this.program
+    while (this.index >= 0) {
+      this.instructions[this.index].runBackward()
+      console.log({ index: this.index, A: this.A, B: this.B, C: this.C })
+      this.index--
+
+      // If we run into the beginning of the program but haven't fulfilled the
+      // requirements yet, loop back to the jmp instruction. (it bugs me how
+      // tailored this is to the specific input given, but I'm not sure how to
+      // make it more robust)
+      if (this.index < 0 && this.outputs.length) {
+        this.index = this.instructions.length - 1
+      }
+    }
+    return this.A
+  }
 }
 
 module.exports.answer2 = (input) => {
-  return new Computer(input).findA()
+  const computer = new Computer(input)
+  const a = computer.findA2()
+  console.log(computer)
+  return a
 }
 
 module.exports.answer1 = (input) => {
