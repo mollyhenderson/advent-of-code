@@ -30,6 +30,7 @@ class Instruction {
   }
 
   run() {
+    // console.log('RUNNING', this)
     const numerator = this.computer.A
     const denominator = 2 ** this.comboOperand
     const divisionResult = Math.trunc(numerator / denominator)
@@ -164,6 +165,8 @@ class Computer {
         new Instruction(this.program[i], this.program[i + 1], this)
       )
     }
+
+    console.log(this)
   }
 
   run() {
@@ -192,20 +195,50 @@ class Computer {
       if (a % 100 === 0) console.log(`A: ${a}`)
       this.A = a
       const out = this.run()
+      console.log(out)
       if (out === this.program) return a
       a++
     }
   }
 
   findA2() {
-    // work backwards
     this.A = 0
     this.B = 0
     this.C = 0
     this.index = this.instructions.length - 1
     this.outputs = this.program
+
+    let res = '000'
+
     while (this.index >= 0) {
-      this.instructions[this.index].runBackward()
+      const instruction = this.instructions[this.index]
+      switch (instruction.instruction) {
+        case 0:
+          // no-op?
+          // remove last 3 bits from A
+          // but we will actually be adding bits during the output instruction
+          break
+        case 1:
+          this.computer.B = this.computer.B ^ this.literalOperand
+          break
+        case 2:
+          break
+        case 3:
+          // jmp instruction; no-op
+          break
+        case 4:
+          break
+        case 5:
+          res += Number.toString(this.outputs.pop(), 2)
+          break
+        case 6:
+          break
+        case 7:
+          break
+        default:
+          throw new Error('Something has gone awry!')
+      }
+
       console.log({ index: this.index, A: this.A, B: this.B, C: this.C })
       this.index--
 

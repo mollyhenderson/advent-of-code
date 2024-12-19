@@ -44,30 +44,40 @@ module.exports.answer2 = (input) => {
   for (const machine of machines) {
     console.log(machine)
     const options = []
-    let aPresses = 0
-    while (true) {
-      if (aPresses % 1000 === 0) console.log(aPresses)
-      const x = machine.buttonA.x * aPresses
-      const y = machine.buttonA.y * aPresses
-      const remainderX = machine.x - x
-      const remainderY = machine.y - y
+    // let aPresses = 10000000000000
 
-      if (remainderX < 0 || remainderY < 0) {
-        break
-      }
+    const px = machine.x
+    const py = machine.y
+    const ax = machine.buttonA.x
+    const ay = machine.buttonA.y
+    const bx = machine.buttonB.x
+    const by = machine.buttonB.y
 
-      const bPresses = remainderX / machine.buttonB.x
+    // while (true) {
+    //   const x = machine.buttonA.x * aPresses
+    //   const y = machine.buttonA.y * aPresses
+    //   const remainderX = machine.x - x
+    //   const remainderY = machine.y - y
 
-      if (
-        Number.isInteger(bPresses) &&
-        remainderY / machine.buttonB.y === bPresses
-      ) {
-        options.push({ a: aPresses, b: bPresses })
-        break
-      }
+    //   if (remainderX < 0 || remainderY < 0) {
+    //     break
+    //   }
 
-      aPresses++
-    }
+    //   const bPresses = remainderX / machine.buttonB.x
+
+    //   if (
+    //     Number.isInteger(bPresses) &&
+    //     remainderY / machine.buttonB.y === bPresses
+    //   ) {
+    //     options.push({ a: aPresses, b: bPresses })
+    //     break
+    //   }
+
+    //   aPresses--
+
+    //   // Binary search?
+    // }
+
     if (options.length) {
       sum += options[0].a * 3 + options[0].b
     }
