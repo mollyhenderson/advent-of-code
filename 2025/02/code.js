@@ -9,7 +9,19 @@ const parseInput = (input) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const ranges = parseInput(input)
+
+  const badIds = []
+  for (const [start, end] of ranges) {
+    for (let i = start; i <= end; i++) {
+      const match = `${i}`.match(/^(\d+)(\1)+$/)
+      if (match) {
+        badIds.push(i)
+      }
+    }
+  }
+
+  return badIds.reduce((sum, curr) => (sum += curr), 0)
 }
 
 module.exports.answer1 = (input) => {
