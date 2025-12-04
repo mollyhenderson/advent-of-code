@@ -21,7 +21,31 @@ const isAccessible = (map, x, y) => {
 }
 
 module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
+  const map = new Map(input)
+
+  const removed = []
+  let accessible = []
+
+  do {
+    accessible = []
+    for (let y = 0; y < map.height(); y++) {
+      for (let x = 0; x < map.width(); x++) {
+        const node = map.at(x, y)
+        if (node.char !== '@') continue
+
+        if (isAccessible(map, x, y)) {
+          accessible.push(node)
+        }
+      }
+    }
+
+    for (const nodeToRemove of accessible) {
+      removed.push(nodeToRemove)
+      nodeToRemove.char = '.'
+    }
+  } while (accessible.length)
+
+  return removed.length
 }
 
 module.exports.answer1 = (input) => {
