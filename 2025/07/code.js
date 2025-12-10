@@ -1,6 +1,6 @@
 const { Map } = require('../../utils/helpers')
 
-const traverse = (s, map) => {
+const traverseBFS = (s, map) => {
   let splitCount = 0
 
   const starts = new Set([s])
@@ -22,35 +22,37 @@ const traverse = (s, map) => {
   return splitCount
 }
 
-// DFS - doesn't work bc some paths converge
-// const traverse = (start, map, splitCount = 0) => {
-//   const next = map.at(start.x, start.y + 1)
-//   console.log(start, splitCount, next)
-//   if (!next) return splitCount // base case
+const traverseDFS = (start, map, splitCount = 0) => {
+  const next = map.at(start.x, start.y + 1)
+  if (!next) return splitCount // base case
 
-//   if (next.char === '^') {
-//     const left = map.at(next.x - 1, next.y)
-//     const right = map.at(next.x + 1, next.y)
-//     const leftSplits = traverse(left, map)
-//     const rightSplits = traverse(right, map)
-//     console.log('Returning from split: ', {
-//       original: next,
-//       leftSplits,
-//       rightSplits,
-//     })
-//     return 1 + splitCount + leftSplits + rightSplits
-//   }
-//   return traverse(next, map, splitCount)
-// }
+  // We memoize results by changing the node's char, if we've already traversed
+  // it and know how many timelines are possible starting from this node. Would
+  // it be better to store that as a different property? Certainly! Was I too
+  // lazy to do that? Obviously.
+  if (Number.isInteger(next.char)) {
+    return next.char
+  }
+
+  if (next.char === '^') {
+    const left = map.at(next.x - 1, next.y)
+    const right = map.at(next.x + 1, next.y)
+    const leftSplits = traverseDFS(left, map)
+    const rightSplits = traverseDFS(right, map)
+    next.char = 1 + splitCount + leftSplits + rightSplits
+    return next.char
+  }
+  return traverseDFS(next, map, splitCount)
+}
 
 module.exports.answer2 = (input) => {
   const map = new Map(input)
   const start = map.nodes().find((n) => n.char === 'S')
-  return traverse(start, map)
+  return traverseDFS(start, map, 1)
 }
 
 module.exports.answer1 = (input) => {
   const map = new Map(input)
   const start = map.nodes().find((n) => n.char === 'S')
-  return traverse(start, map)
+  return traverseBFS(start, map)
 }
