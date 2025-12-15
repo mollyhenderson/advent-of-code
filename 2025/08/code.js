@@ -50,11 +50,7 @@ const getMinDistance = (points) => {
   return { min, minPoints }
 }
 
-module.exports.answer2 = (input) => {
-  return 'This function is not yet implemented!'
-}
-
-const findCircuit = (point, points) => {
+const findCircuit = (point) => {
   const circuit = new PoppableSet([point])
   const toTraverse = new PoppableSet([point])
   while (toTraverse.size) {
@@ -67,12 +63,51 @@ const findCircuit = (point, points) => {
       }
     }
   }
+
+  circuit.forEach((p) => (p.traversed = false)) // reset
+
   return circuit
+}
+
+const getNumCircuits = (points) => {
+  const pointSet = new PoppableSet(points)
+
+  const circuits = []
+  while (pointSet.size) {
+    const point = pointSet.pop()
+    const circuit = findCircuit(point, pointSet)
+    circuits.push(circuit)
+
+    for (const point of circuit) {
+      pointSet.delete(point)
+    }
+  }
+  return circuits.length
+}
+
+module.exports.answer2 = (input) => {
+  const MAX_ITERATIONS = 10000
+  const lines = getLines(input)
+  const points = lines.map((l) => new Point(l))
+  let lastMinPoints = []
+  let i = 0
+  while (i++ < MAX_ITERATIONS) {
+    const { minPoints } = getMinDistance(points)
+    lastMinPoints = minPoints
+
+    minPoints[0].connectTo(minPoints[1])
+    minPoints[1].connectTo(minPoints[0])
+
+    const numCircuits = getNumCircuits(points)
+    if (numCircuits === 1) break
+  }
+
+  return lastMinPoints[0].x * lastMinPoints[1].x
 }
 
 module.exports.answer1 = (input) => {
   // const ITERATIONS = 10
-  const ITERATIONS = 1000
+  const ITERATIONS = 10000
   const lines = getLines(input)
   const points = lines.map((l) => new Point(l))
   let i = 0
