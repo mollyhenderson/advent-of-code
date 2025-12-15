@@ -69,7 +69,7 @@ const findCircuit = (point) => {
   return circuit
 }
 
-const getNumCircuits = (points) => {
+const getCircuits = (points) => {
   const pointSet = new PoppableSet(points)
 
   const circuits = []
@@ -82,7 +82,7 @@ const getNumCircuits = (points) => {
       pointSet.delete(point)
     }
   }
-  return circuits.length
+  return circuits
 }
 
 module.exports.answer2 = (input) => {
@@ -91,6 +91,7 @@ module.exports.answer2 = (input) => {
   const points = lines.map((l) => new Point(l))
   let lastMinPoints = []
   let i = 0
+  // just to avoid an infinite loop - I know this is an upper bound
   while (i++ < MAX_ITERATIONS) {
     const { minPoints } = getMinDistance(points)
     lastMinPoints = minPoints
@@ -98,7 +99,7 @@ module.exports.answer2 = (input) => {
     minPoints[0].connectTo(minPoints[1])
     minPoints[1].connectTo(minPoints[0])
 
-    const numCircuits = getNumCircuits(points)
+    const numCircuits = getCircuits(points).length
     if (numCircuits === 1) break
   }
 
@@ -107,7 +108,7 @@ module.exports.answer2 = (input) => {
 
 module.exports.answer1 = (input) => {
   // const ITERATIONS = 10
-  const ITERATIONS = 10000
+  const ITERATIONS = 1000
   const lines = getLines(input)
   const points = lines.map((l) => new Point(l))
   let i = 0
@@ -117,18 +118,7 @@ module.exports.answer1 = (input) => {
     minPoints[1].connectTo(minPoints[0])
   }
 
-  const pointSet = new PoppableSet(points)
-
-  const circuits = []
-  while (pointSet.size) {
-    const point = pointSet.pop()
-    const circuit = findCircuit(point, pointSet)
-    circuits.push(circuit)
-
-    for (const point of circuit) {
-      pointSet.delete(point)
-    }
-  }
+  const circuits = getCircuits(points)
 
   circuits.sort((a, b) => a.size - b.size)
   return circuits.pop().size * circuits.pop().size * circuits.pop().size
