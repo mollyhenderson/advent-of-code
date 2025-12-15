@@ -14,6 +14,14 @@ const isEven = (num) => num % 2 === 0
 
 const isOdd = (num) => num % 2 !== 0
 
+class PoppableSet extends Set {
+  pop() {
+    const item = this.values().next().value
+    this.delete(item)
+    return item
+  }
+}
+
 // Basic node. Handles parsing input; can be extended to add additional functionality
 class Node {
   char
@@ -253,6 +261,7 @@ class GrowingMap {
 }
 
 module.exports = {
+  PoppableSet,
   Node,
   Map,
   getLines,
